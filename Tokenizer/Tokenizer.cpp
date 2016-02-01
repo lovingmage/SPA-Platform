@@ -42,6 +42,9 @@ namespace Scanner
     static ConsumeState* _pEatCComment;
     static ConsumeState* _pEatWhitespace;
     static ConsumeState* _pEatPunctuator;
+	static ConsumeState* _pEatSpecialSingleChars;
+	static ConsumeState* _pEateSpecialCharPairs;
+	static ConsumeState* _pEateQoutedString;
     static ConsumeState* _pEatAlphanum;
     static ConsumeState* _pEatNewline;
   };
@@ -58,6 +61,9 @@ ConsumeState* ConsumeState::_pEatCppComment = nullptr;
 ConsumeState* ConsumeState::_pEatCComment = nullptr;
 ConsumeState* ConsumeState::_pEatWhitespace = nullptr;
 ConsumeState* ConsumeState::_pEatPunctuator = nullptr;
+ConsumeState* ConsumeState::_pEatSpecialSingleChars = nullptr;
+ConsumeState* ConsumeState::_pEateSpecialCharPairs = nullptr;
+ConsumeState* ConsumeState::_pEateQoutedString = nullptr;
 ConsumeState* ConsumeState::_pEatAlphanum = nullptr;
 ConsumeState* ConsumeState::_pEatNewline;
 
@@ -84,6 +90,9 @@ ConsumeState* ConsumeState::nextState()
     testLog("state: eatCComment");
     return _pEatCComment;
   }
+
+
+
   if (currChar == '\n')
   {
     testLog("state: eatNewLine");
@@ -96,13 +105,33 @@ ConsumeState* ConsumeState::nextState()
   }
   if (ispunct(currChar))
   {
-    testLog("state: eatPunctuator");
+	  //This place is self modified function
+	  if (currChar == 34 || currChar == 36)
+	  {
+		  testLog("state: eatQoutedString");
+		  return _pEateQoutedString;
+	  }
+	  if (currChar == '<' || currChar == '>' || currChar == '[' || currChar == ']' || currChar == ':')
+	  {
+		  if ((currChar == '<' && chNext == '<') || (currChar == '>' && chNext == '>') || (currChar == ':' && chNext == ':')) {
+			  testLog("state: eatSpecialCharPairs");
+			  return _pEateSpecialCharPairs;
+		  }
+		  else {
+			  testLog("state: eatSpecialStringChars");
+			  return _pEatSpecialSingleChars;
+		  }
+	  }
+	  //Self Modified Part End
+	testLog("state: eatPunctuator");
     return _pEatPunctuator;
   }
   if (!_pIn->good())
     return _pEatWhitespace;
   throw(std::logic_error("invalid type"));
 }
+
+
 
 class EatWhitespace : public ConsumeState
 {
@@ -167,6 +196,59 @@ public:
   }
 };
 
+// Self Modified Code Part--EatQoutedString
+class EatQoutedString : public ConsumeState
+{
+public:
+	virtual void eatChars()
+	{
+		token.clear();
+		//token += currChar;
+		//currChar = _pIn->get();
+		//token.clear();
+		do {
+			token += currChar;
+			if (!_pIn->good())
+				return;
+			prevChar = currChar;
+			currChar = _pIn->get();
+		} while (currChar != 34 && currChar != 36 && prevChar != 92);
+		token += currChar;
+		_pIn->get();
+		currChar = _pIn->get();
+	}
+};
+
+class EatSpecialStringChars : public ConsumeState
+{
+public:
+	virtual void eatChars()
+	{
+		token.clear();
+		token += currChar;
+		if (!_pIn->good())
+			return;
+		currChar = _pIn->get();
+	}
+};
+
+class EatSpecialCharPairs : public ConsumeState
+{
+public:
+	virtual void eatChars()
+	{
+		token.clear();
+		int Jishujun = 2;
+		do {
+			token += currChar;
+			if (!_pIn->good())
+				return;
+			currChar = _pIn->get();
+		} while (--Jishujun);
+	}
+};
+//Self Modified Part Ended
+
 class EatAlphanum : public ConsumeState
 {
 public:
@@ -207,6 +289,9 @@ ConsumeState::ConsumeState()
     _pEatCComment = new EatCComment();
     _pEatCppComment = new EatCppComment();
     _pEatPunctuator = new EatPunctuator();
+	_pEatSpecialSingleChars = new EatSpecialStringChars();
+	_pEateSpecialCharPairs = new EatSpecialCharPairs();
+	_pEateQoutedString = new EatQoutedString();
     _pEatWhitespace = new EatWhitespace();
     _pEatNewline = new EatNewline();
     _pState = _pEatWhitespace;
@@ -223,6 +308,9 @@ ConsumeState::~ConsumeState()
     delete _pEatCComment;
     delete _pEatCppComment;
     delete _pEatPunctuator;
+	delete _pEatSpecialSingleChars;
+	delete _pEateSpecialCharPairs;
+	delete _pEateQoutedString;
     delete _pEatWhitespace;
     delete _pEatNewline;
   }
@@ -272,9 +360,9 @@ void testLog(const std::string& msg)
 
 int main()
 {
-  std::string fileSpec = "../Tokenizer/Tokenizer.cpp";
+  //std::string fileSpec = "../Tokenizer/Tokenizer.cpp";
   //std::string fileSpec = "../Tokenizer/Tokenizer.h";
-  //std::string fileSpec = "../Tokenizer/Test.txt";
+  std::string fileSpec = "../Tokenizer/Test.txt";
 
   std::ifstream in(fileSpec);
   if (!in.good())
@@ -292,6 +380,7 @@ int main()
     std::cout << "\n -- " << tok;
   }
   std::cout << "\n\n";
+  system("pause");
   return 0;
 }
 #endif
