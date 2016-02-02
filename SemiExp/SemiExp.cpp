@@ -29,7 +29,7 @@ bool SemiExp::get()
       break;
     _tokens.push_back(token);
     
-    if (token == "{")
+    if (token == "{" || token == "}")
       return true;
   }
   return false;
