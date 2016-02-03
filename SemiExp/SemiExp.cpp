@@ -28,6 +28,13 @@ bool SemiExp::get()
     if (token == "")
       break;
     _tokens.push_back(token);
+      
+      if ((token = _pToker -> getTok()) == "for"){
+          while(token != ")"){
+              token = _pToker->getTok();
+              _tokens.push_back(token);
+          }
+      }
     
     if (token == "{" || token == "}")
       return true;
