@@ -59,6 +59,8 @@ namespace Scanner
     Token operator[](size_t n);
     size_t length();
     void show();
+    std::string LAST_TOKEN = "newline";
+      std::string CURRENT_TOKEN;
   private:
     std::vector<Token> _tokens;
     Toker* _pToker;
