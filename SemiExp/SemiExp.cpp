@@ -17,8 +17,8 @@
 
 using namespace Scanner;
 
-std::string LAST_TOKEN = "newline";
-std::string CURRENT_TOKEN = "newline";
+//std::string LAST_TOKEN = "newline";
+//std::string CURRENT_TOKEN = "newline";
 
 SemiExp::SemiExp(Toker* pToker) : _pToker(pToker) {
     CURRENT_TOKEN = _pToker->getTok();
@@ -34,23 +34,23 @@ bool SemiExp::get()
       break;
     _tokens.push_back(token);
       
-      CURRENT_TOKEN = _pToker->getTok();
+    CURRENT_TOKEN = _pToker->getTok();
 
     if ((token == "Public" || token == "Private" || token == "Protect")&&CURRENT_TOKEN == ":"){
-        while (token != "newline") {
-            CURRENT_TOKEN = _pToker->getTok;
-            _tokens.push_back(CURRENT_TOKEN);
-        }
         LAST_TOKEN = CURRENT_TOKEN;
+        _tokens.push_back(CURRENT_TOKEN);
+        CURRENT_TOKEN = _pToker-> getTok();
         return true;
       }
-      if (token == "#" && LAST_TOKEN = "newline"){
+      
+    if (token == "#" && LAST_TOKEN = "newline"){
           while (token != "newline") {
               token = _pToker->getTok;
               _tokens.push_back(token);
           }
-          LAST_TOKEN = "newline";
-          return true;
+        LAST_TOKEN = "newline";
+        CURRENT_TOKEN = _pToker->getTok();
+        return true;
       }
     
     //_tokens.push_back(token);
@@ -63,11 +63,7 @@ bool SemiExp::get()
       }
 //***********************************************************************
       
-      if (token = "newline" && _pToker->getTok() == "Public"){
-          return true
-      }
-      
-    
+
       if (token == "{" || token == "}"){
           LAST_TOKEN = token;
           return true;
