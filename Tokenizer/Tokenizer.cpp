@@ -71,15 +71,14 @@ void testLog(const std::string& msg);
 
 ConsumeState* ConsumeState::nextState()
 {
-  if (!(_pIn->good()))
-    return nullptr;
-
+  if (!(_pIn->good())) { return nullptr; }
   int chNext = _pIn->peek();
-  if (std::isspace(currChar) && currChar != '\n')
-  {
-    testLog("state: eatWhitespace");
-    return _pEatWhitespace;
-  }
+
+  if (std::isspace(currChar) && currChar != '\n'){
+		testLog("state: eatWhitespace");
+		return _pEatWhitespace;
+	}
+
   if (currChar == '/' && chNext == '/')
   {
     testLog("state: eatCppComment");
@@ -90,8 +89,6 @@ ConsumeState* ConsumeState::nextState()
     testLog("state: eatCComment");
     return _pEatCComment;
   }
-
-
 
   if (currChar == '\n')
   {
@@ -111,9 +108,9 @@ ConsumeState* ConsumeState::nextState()
 		  testLog("state: eatQoutedString");
 		  return _pEateQoutedString;
 	  }
-	  if (currChar == '<' || currChar == '>' || currChar == '[' || currChar == ']' || currChar == ':')
+	  if (currChar == '<' || currChar == '>' || currChar == '[' || currChar == ']' || currChar == ':' || currChar == '(' || currChar == ')' || currChar == '{' || currChar == '}' || currChar == '=' || currChar == '+' || currChar == '-' || currChar == '*' || currChar == '/')
 	  {
-		  if ((currChar == '<' && chNext == '<') || (currChar == '>' && chNext == '>') || (currChar == ':' && chNext == ':')) {
+		  if ((currChar == '<' && chNext == '<') || (currChar == '>' && chNext == '>') || (currChar == ':' && chNext == ':') || (currChar == '+' && chNext == '+') || (currChar == '-' && chNext == '-') || (currChar == '=' && chNext == '=') || (currChar == '+' && chNext == '=') || (currChar == '-' && chNext == '=') || (currChar == '*' && chNext == '=') || (currChar == '/' && chNext == '=')) {
 			  testLog("state: eatSpecialCharPairs");
 			  return _pEateSpecialCharPairs;
 		  }
@@ -156,6 +153,7 @@ public:
     token.clear();
     //std::cout << "\n  eating C++ comment";
     do {
+	  token += currChar;
       if (!_pIn->good())  // end of stream
         return;
       currChar = _pIn->get();
@@ -171,12 +169,15 @@ public:
     token.clear();
     //std::cout << "\n  eating C comment";
     do {
+	token += currChar;
       if (!_pIn->good())  // end of stream
         return;
       currChar = _pIn->get();
     } while (currChar != '*' || _pIn->peek() != '/');
-    _pIn->get();
+	//currChar = _pIn->get();
+	token += currChar;
     currChar = _pIn->get();
+	token += currChar;
   }
 };
 
@@ -203,19 +204,16 @@ public:
 	virtual void eatChars()
 	{
 		token.clear();
-		//token += currChar;
-		//currChar = _pIn->get();
-		//token.clear();
 		do {
 			token += currChar;
 			if (!_pIn->good())
 				return;
-			prevChar = currChar;
 			currChar = _pIn->get();
-		} while (currChar != 34 && currChar != 36 && prevChar != 92);
+		} while (currChar != 34 && currChar != 36);
 		token += currChar;
-		_pIn->get();
 		currChar = _pIn->get();
+		
+		
 	}
 };
 
