@@ -1,0 +1,42 @@
+
+
+
+#include<iostream>
+/*	dfasfjsakfjasklfjas
+	asfadsfdasfdsafasf
+	fsadfasfdasf
+	afsdfdfs
+*/
+//dafsafdasfdsfasfasfdsfadsffafadsfadsfadsf
+#include<iostream>
+#include<string.h>
+int main{
+	for (int i=0; i<100;i++){
+		cout<<"(int i=0; i<100;i++)";
+	}
+}
+
+namespace Scanner
+{
+  class ConsumeState
+  {
+  public:
+    ConsumeState();
+    virtual ~ConsumeState();
+    void attach(std::istream* pIn) { _pIn = pIn; }
+    virtual void eatChars() = 0;
+    void consumeChars() {
+      _pState->eatChars();
+      _pState = nextState();
+    }
+    bool canRead() { return _pIn->good(); }
+    std::string getTok() { return token; }
+    bool hasTok() { return token.size() > 0; }
+    ConsumeState* nextState();
+  protected:
+    static std::string token;
+    static std::istream* _pIn;
+    static int prevChar;
+    static int currChar;
+  };
+}

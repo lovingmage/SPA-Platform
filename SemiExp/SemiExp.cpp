@@ -17,58 +17,65 @@
 
 using namespace Scanner;
 
-//std::string LAST_TOKEN = "newline";
-//std::string CURRENT_TOKEN = "newline";
-
-SemiExp::SemiExp(Toker* pToker) : _pToker(pToker) {
-    CURRENT_TOKEN = _pToker->getTok();
-}
+SemiExp::SemiExp(Toker* pToker) : _pToker(pToker) {}
 
 bool SemiExp::get()
 {
+  if (_pToker == nullptr)
+  throw(std::logic_error("no Toker reference"));
   _tokens.clear();
   while (true)
   {
-    std::string token = CURRENT_TOKEN
+    std::string token = _pToker->getTok();
     if (token == "")
       break;
-    _tokens.push_back(token);
-      
-    CURRENT_TOKEN = _pToker->getTok();
+	if (isComment(token))
+		continue;
 
-    if ((token == "Public" || token == "Private" || token == "Protect")&&CURRENT_TOKEN == ":"){
-        LAST_TOKEN = CURRENT_TOKEN;
-        _tokens.push_back(CURRENT_TOKEN);
-        CURRENT_TOKEN = _pToker-> getTok();
-        return true;
-      }
-      
-    if (token == "#" && LAST_TOKEN = "newline"){
-          while (token != "newline") {
-              token = _pToker->getTok;
-              _tokens.push_back(token);
-          }
-        LAST_TOKEN = "newline";
-        CURRENT_TOKEN = _pToker->getTok();
-        return true;
-      }
-    
-    //_tokens.push_back(token);
-      
-      if ((token = _pToker -> getTok()) == "for"){
-          while(token != ")"){
-              token = _pToker->getTok();
-              _tokens.push_back(token);
-          }
-      }
-//***********************************************************************
-      
+	_tokens.push_back(token);
 
-      if (token == "{" || token == "}"){
-          LAST_TOKEN = token;
-          return true;
+	if (token == "\n" && find("#") != length()) {
+		trimFront();
+		if (_tokens[0] == "#") {
+			return true;
+		}
+		
+	}
+
+	if (token == "private" || token == "public" || token == "protected") {
+		token = _pToker->getTok();
+		if (token == ":") {
+			_tokens.push_back(token);
+			return true;
+		}
+		if (token == "{" || token == "}" || token == ";") {
+			_tokens.push_back(token);
+			return true;
+		}
+		else { _tokens.push_back(token); }
+		
+	}
+	if (token == "for") {
+		token = _pToker->getTok();
+		while (token != ")") {
+			_tokens.push_back(token);
+			token = _pToker->getTok();
+		}
+		_tokens.push_back(token);
+	}
+   
+	if (token == "{" || token == "}" || token == ";")
+      return true;
   }
   return false;
+}
+
+//----< remove leading newlines >------------------------------
+
+void SemiExp::trimFront()
+{
+	while (_tokens.size() > 0 && (_tokens[0] == "\n" || _tokens[0] == ""))
+		remove(0);
 }
 
 Token SemiExp::operator[](size_t n)
@@ -76,6 +83,46 @@ Token SemiExp::operator[](size_t n)
   if (n < 0 || n >= _tokens.size())
     throw(std::invalid_argument("index out of range"));
   return _tokens[n];
+}
+
+//----< remove tok if found in semi-expression >---------------
+
+bool SemiExp::remove(const std::string& tok)
+{
+	std::vector<std::string>::iterator it;
+	it = std::find(_tokens.begin(), _tokens.end(), tok);
+	if (it != _tokens.end())
+	{
+		_tokens.erase(it);
+		return true;
+	}
+	return false;
+}
+//----< remove tok at specified indes >------------------------
+
+bool SemiExp::remove(size_t i)
+{
+	if (i<0 || _tokens.size() <= i)
+		return false;
+	std::vector<std::string>::iterator it = _tokens.begin();
+	_tokens.erase(it + i);
+	return true;
+}
+
+bool SemiExp::isComment(const std::string& tok)
+{
+	if (tok.length() < 2) return false;
+	if (tok[0] != '/') return false;
+	if (tok[1] == '/' || tok[1] == '*') return true;
+	return false;
+}
+
+size_t SemiExp::find(const std::string& tok)
+{
+	for (size_t i = 0; i<length(); ++i)
+		if (tok == _tokens[i])
+			return i;
+	return length();
 }
 
 size_t SemiExp::length()
@@ -95,7 +142,7 @@ void SemiExp::show()
 int main()
 {
   Toker toker;
-  std::string fileSpec = "../Tokenizer/Tokenizer.cpp";
+  std::string fileSpec = "./SemiExp.cpp";
   std::fstream in(fileSpec);
   if (!in.good())
   {
@@ -119,6 +166,7 @@ int main()
     std::cout << "\n  -- semiExpression --";
     semi.show();
     std::cout << "\n\n";
+	system("pause");
   }
   return 0;
 }
