@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////
 // SemiExpression.cpp - collect tokens for analysis                  //
-// ver 0.1                                                           //
+// ver 0.4                                                           //
 // Language:    C++, Visual Studio 2015                              //
 // Application: Parser component, CIS687 - Object Oriented Design    //
 // Author:		Chenghong Wang, Syracuse University					 //
@@ -60,7 +60,7 @@ bool SemiExp::get()
 	}
 	if (token == "for") {
 		token = _pToker->getTok();
-		while (token != "{") {
+		while (token != "{" && token!="\n") {
 			_tokens.push_back(token);
 			token = _pToker->getTok();
 		}
@@ -79,6 +79,17 @@ void SemiExp::trimFront()
 {
 	while (_tokens.size() > 0 && (_tokens[0] == "\n" || _tokens[0] == ""))
 		remove(0);
+}
+
+void SemiExp::toLower()
+{
+	for (size_t i = 0; i<length(); ++i)
+	{
+		for (size_t j = 0; j<(*this)[i].length(); ++j)
+		{
+			(*this)[i][j] = tolower((*this)[i][j]);
+		}
+	}
 }
 
 Token SemiExp::operator[](size_t n)

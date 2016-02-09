@@ -1,0 +1,61 @@
+
+#include<iostream>
+#include "../SemiExp/SemiExp.h"
+#define MAXIMUM 655
+/*	dfasfjsakfjasklfjas
+	asfadsfdasfdsafasf
+	fsadfasfdasf
+	afsdfdfs
+*/
+//dafsafdasfdsfasfasfdsfadsffafadsfadsfadsf
+#include<iostream>
+#include<string.h>
+
+
+cout << ">>>>>>>>>>>>>>>>>>extracting newline if a # is the first character on that line<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+cout << ">>>>>>>>>>>>>>>>>>TrimFront() method in ITokecollection interface been implemented<<<<<<<<<<<<<<<<<<<<<<<<<";
+cout << ">>>>>>>>>>>>>>>>>>>>>find() method in ITokecollection interface been implemented<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+cout << ">>>>>>>>>>>>>>>>>>remove() method in ITokecollection interface been implemented<<<<<<<<<<<<<<<<<<<<<<<<<";
+cout << ">>>>>>>>>>>>>>>>>>Push_Back() method in ITokecollection interface been implemented<<<<<<<<<<<<<<<<<<<<<<<<<";
+cout << ">>>>>>>>>>>>>>>>>>Operator[] method in ITokecollection interface been implemented<<<<<<<<<<<<<<<<<<<<<<<<<";
+cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Function CHECKED!<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+
+int main{
+	for (int i=0; i<100;i++){
+		cout<<"(int i=0; i<100;i++)";
+	}
+	for (int j = 0; (j+1) < 99; j++){
+		cout<< "Hello Here is a For Loop!!!"
+	}
+}
+cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>No break at semicolon when face FOR loops<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Function CHECKED!<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+// ajlkfjdafa "fadfafasfdasfdasfasd"
+
+namespace Scanner
+{
+  class ConsumeState
+  {
+  public:
+cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Break at key Words public, private, protected<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+cout << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>Function CHECKED!<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
+    ConsumeState();
+    virtual ~ConsumeState();
+    void attach(std::istream* pIn) { _pIn = pIn; }
+    virtual void eatChars() = 0;
+    void consumeChars() {
+      _pState->eatChars();
+      _pState = nextState();
+    }
+    bool canRead() { return _pIn->good(); }
+    std::string getTok() { return token; }
+    bool hasTok() { return token.size() > 0; }
+    ConsumeState* nextState();
+  protected:
+    static std::string token;
+    static std::istream* _pIn;
+    static int prevChar;
+    static int currChar;
+  };
+}
+

@@ -1,0 +1,21 @@
+"=====================Alphanumerical Tokens Test Begins Here =================== "
+int a = b;
+do we need to perform 10020;
+"===================== Punchuation Tokens Test Begins Here ======================"
+~@$%;
+!!~&&;
+"===================== special one tokens test begins here ======================"
++-*()[]{}<>
+"====================== special two tokens test begins here ====================="
+<<>>++--+=-=::*=
+"====================== C comment tokens test begins here ======================="
+/*
+	Hi this is Wang, Jim Fawcett is a good professor!
+*/
+"====================== C++ comment tokens test begins here ====================="
+// Hi this is Wang, CIS687 is awesome !!!!!!!
+// Prof. Jim Fawcett is a good guy :)
+"==================== Qouted String tokens test begins here ====================="
+"Do you think I believe that I can the tokenizer can perform qouted string!"
+"Wow great! Cool!"
+"Hello Jack it\'s me!"

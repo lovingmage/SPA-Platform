@@ -2,10 +2,13 @@
 #define TOKENIZER_H
 ///////////////////////////////////////////////////////////////////////
 // Tokenizer.h - read words from a std::stream                       //
-// ver 3.2                                                           //
+// ver 0.4                                                          //
 // Language:    C++, Visual Studio 2015                              //
-// Application: Parser component, CSE687 - Object Oriented Design    //
-// Author:      Jim Fawcett, Syracuse University, CST 4-187          //
+// Application: Parser component, CIS687 - Object Oriented Design    //
+// Author:		Chenghong Wang, Syracuse University					 //
+//				cwang132@syr.edu									 //
+//																	 //
+// Source:      Jim Fawcett, CIS-687 SP16 Help Code Pr1	             //
 //              jfawcett@twcny.rr.com                                //
 ///////////////////////////////////////////////////////////////////////
 /*
@@ -21,31 +24,31 @@
  *
  * Build Process:
  * --------------
- * Required Files: Tokenizer.h, Tokenizer.cpp
+ * Required Files: Tokenizer.h, Tokenizer.cpp, Utilities.h, Utilities.cpp
  * Build Command: devenv Tokenizer.sln /rebuild debug
  *
  * Maintenance History:
  * --------------------
- * ver 3.2 : 28 Jan 2016
+ * ver 0.4 : 04 Feb 2016
+ * - Return quoted strings as single token.  Handle \" and \'correctly.
+ * - Converting eatNewLine() to eatSpecialTokens() - see below
+ * - Return [, ], {, }, (, ), <, >, :, ; as single character tokens
+ * - Return <<, >>, +=, -=, *=, /=, :: as two character tokens
+ * - Add setSpecialChars let users to define their single char and
+ * - double char pair.
+ * ver 0.3 : 31 Jan 2016
  * - fixed bug in ConsumeState::nextState() by returning a valid state
  *   pointer if all tests fail due to reaching end of file instead of
  *   throwing logic_error exception.
- * ver 3.1 : 27 Jan 2016
+ * ver 0.2 : 29 Jan 2016
  * - fixed bug in EatCComment::eatChars()
  * - removed redundant statements assigning _pState in derived eatChars() 
  *   functions
  * - removed calls to nextState() in each derived eatChars() and fixed
  *   call to nextState() in ConsumeState::consumeChars()
- * ver 3.0 : 11 Jun 2014
- * - first release of new design
+ * ver 0.1 : 29 Jan 2016
+ * - start up Tokenizer project
  *
- * Planned Additions and Changes:
- * ------------------------------
- * - Return quoted strings as single token.  This must handle \" and \'
- *   correctly.
- * - Consider converting eatNewLine() to eatSpecialTokens() - see below
- * - Return [, ], {, }, (, ), <, >, :, ; as single character tokens
- * - Return <<, >>, +=, -=, *=, /=, :: as two character tokens
  */
 #include <iosfwd>
 #include <string>
@@ -62,6 +65,9 @@ namespace Scanner
     bool attach(std::istream* pIn);
     std::string getTok();
     bool canRead();
+	static void reset();
+	    void setSpecialTokens(const std::string& commaSeparatedString);
+
   private:
     ConsumeState* pConsumer;
   };

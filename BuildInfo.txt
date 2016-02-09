@@ -1,0 +1,7 @@
+Build Project1 Helper Code
+
+1. Set Tokenizer > Properties > General > Configuration Type = Static Library
+2. Set Tokenizer > Properties > C/C++ > Preprocessor > TEST_TOKENIZER = zTEST_TOKENIZER
+3. rebuild Tokenizer project
+4. rebuild SemiExp project
+5. run
