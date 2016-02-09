@@ -31,3 +31,4 @@
 *.filters
 *. sln
 *.vcxproj
+/Debug/*

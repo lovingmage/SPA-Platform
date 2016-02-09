@@ -1,11 +1,15 @@
 ///////////////////////////////////////////////////////////////////////
 // SemiExpression.cpp - collect tokens for analysis                  //
-// ver 3.1                                                           //
+// ver 0.1                                                           //
 // Language:    C++, Visual Studio 2015                              //
-// Application: Parser component, CSE687 - Object Oriented Design    //
-// Author:      Jim Fawcett, Syracuse University, CST 4-187          //
+// Application: Parser component, CIS687 - Object Oriented Design    //
+// Author:		Chenghong Wang, Syracuse University					 //
+//				cwang132@syr.edu									 //
+//																	 //
+// Source:      Jim Fawcett, CIS-687 SP16 Help Code Pr1	             //
 //              jfawcett@twcny.rr.com                                //
 ///////////////////////////////////////////////////////////////////////
+
 
 #include <fstream>
 #include <iostream>
@@ -38,8 +42,7 @@ bool SemiExp::get()
 		trimFront();
 		if (_tokens[0] == "#") {
 			return true;
-		}
-		
+		}	
 	}
 
 	if (token == "private" || token == "public" || token == "protected") {
@@ -57,7 +60,7 @@ bool SemiExp::get()
 	}
 	if (token == "for") {
 		token = _pToker->getTok();
-		while (token != ")") {
+		while (token != "{") {
 			_tokens.push_back(token);
 			token = _pToker->getTok();
 		}
@@ -89,7 +92,7 @@ Token SemiExp::operator[](size_t n)
 
 bool SemiExp::remove(const std::string& tok)
 {
-	std::vector<std::string>::iterator it;
+	std::vector<std::string>::iterator it; 
 	it = std::find(_tokens.begin(), _tokens.end(), tok);
 	if (it != _tokens.end())
 	{
@@ -139,10 +142,19 @@ void SemiExp::show()
   std::cout << "\n";
 }
 
+void SemiExp::clear() { _tokens.clear(); }
+
+void SemiExp::push_back(const std::string& tok)
+{
+	_tokens.push_back(tok);
+}
+
+
+#ifdef TEST_SEMIEXP
 int main()
 {
   Toker toker;
-  std::string fileSpec = "./SemiExp.cpp";
+  std::string fileSpec = "./test2.txt";
   std::fstream in(fileSpec);
   if (!in.good())
   {
@@ -166,7 +178,8 @@ int main()
     std::cout << "\n  -- semiExpression --";
     semi.show();
     std::cout << "\n\n";
-	system("pause");
   }
+  system("pause");
   return 0;
 }
+#endif

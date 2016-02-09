@@ -51,12 +51,14 @@
 
 #include <vector>
 #include "../Tokenizer/Tokenizer.h"
+#include "../TestExecutive/itokcollection.h"
+
 
 namespace Scanner
 {
   using Token = std::string;
 
-  class SemiExp
+  class SemiExp : public ITokCollection
   {
   public:
     SemiExp(Toker* pToker = nullptr);
@@ -71,6 +73,8 @@ namespace Scanner
 	bool remove(size_t i);
     void show();
 	void trimFront();
+	void clear();
+	void push_back(const std::string& tok);
 	std::string CURRENT_TOKEN;
 	std::string LAST_TOKEN = "newline";
   private:
@@ -78,4 +82,5 @@ namespace Scanner
     Toker* _pToker;
   };
 }
+
 #endif

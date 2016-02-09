@@ -1,0 +1,7 @@
+/*
+	adsfsaklfjsakfjsafajs
+*/
+#include<iostream>
+int main(){
+	cout<<"Simian Sun is a bad man";
+}

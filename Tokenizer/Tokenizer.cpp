@@ -1,11 +1,14 @@
-/////////////////////////////////////////////////////////////////////
-// Tokenizer.cpp - read words from a std::stream                   //
-// ver 3.2                                                         //
-// Language:    C++, Visual Studio 2015                            //
-// Application: Parser component, CSE687 - Object Oriented Design  //
-// Author:      Jim Fawcett, Syracuse University, CST 4-187        //
-//              jfawcett@twcny.rr.com                              //
-/////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////
+// Tokenizer.cpp - read words from a std::stream                     //
+// ver 0.15                                                          //
+// Language:    C++, Visual Studio 2015                              //
+// Application: Parser component, CSE687 - Object Oriented Design	 //
+// Author:		Chenghong Wang, Syracuse University					 //
+//				cwang132@syr.edu									 //
+//																	 //
+// Source:      Jim Fawcett, CIS-687 SP16 Help Code Pr1	             //
+//              jfawcett@twcny.rr.com                                //
+///////////////////////////////////////////////////////////////////////
 /*
   Helper code that does not attempt to handle all tokenizing
   special cases like escaped characters.
@@ -14,6 +17,10 @@
 #include <iostream>
 #include <cctype>
 #include <string>
+#include <vector>
+
+using Token = std::string;
+
 
 namespace Scanner
 {
@@ -32,9 +39,15 @@ namespace Scanner
     std::string getTok() { return token; }
     bool hasTok() { return token.size() > 0; }
     ConsumeState* nextState();
+	bool isOneCharToken(std::string tok);
+	bool isTwoCharToken(std::string tok);
+	std::string makeString(int ch);
   protected:
-    static std::string token;
+
+	static std::string token;
     static std::istream* _pIn;
+	static std::vector<std::string> _oneCharTokens;
+	static std::vector<std::string> _twoCharTokens;
     static int prevChar;
     static int currChar;
     static ConsumeState* _pState;
@@ -52,6 +65,7 @@ namespace Scanner
 
 using namespace Scanner;
 
+
 std::string ConsumeState::token;
 std::istream* ConsumeState::_pIn;
 int ConsumeState::prevChar;
@@ -66,6 +80,14 @@ ConsumeState* ConsumeState::_pEateSpecialCharPairs = nullptr;
 ConsumeState* ConsumeState::_pEateQoutedString = nullptr;
 ConsumeState* ConsumeState::_pEatAlphanum = nullptr;
 ConsumeState* ConsumeState::_pEatNewline;
+std::vector<std::string> ConsumeState::_oneCharTokens =
+{
+	"\n", "<", ">", "{", "}", "[", "]", "(", ")", ":", "=", "+", "-", "*", "."
+};
+std::vector<std::string> ConsumeState::_twoCharTokens =
+{
+	"<<", ">>", "::", "++", "--", "==", "+=", "-=", "*=", "/="
+};
 
 void testLog(const std::string& msg);
 
@@ -84,6 +106,7 @@ ConsumeState* ConsumeState::nextState()
     testLog("state: eatCppComment");
     return _pEatCppComment;
   }
+
   if (currChar == '/' && chNext == '*')
   {
     testLog("state: eatCComment");
@@ -95,11 +118,13 @@ ConsumeState* ConsumeState::nextState()
     testLog("state: eatNewLine");
     return _pEatNewline;
   }
+
   if (std::isalnum(currChar))
   {
     testLog("state: eatAlphanum");
     return _pEatAlphanum;
   }
+
   if (ispunct(currChar))
   {
 	  //This place is self modified function
@@ -108,6 +133,20 @@ ConsumeState* ConsumeState::nextState()
 		  testLog("state: eatQoutedString");
 		  return _pEateQoutedString;
 	  }
+
+	  if (isOneCharToken(makeString(currChar)))
+	  {
+		  return _pEatSpecialSingleChars;
+	  }
+
+	  std::string CharPair = makeString(currChar);
+	  CharPair.push_back(chNext);
+
+	  if (isTwoCharToken(CharPair))
+	  {
+		  return _pEateSpecialCharPairs;
+	  }
+	  /*
 	  if (currChar == '<' || currChar == '>' || currChar == '[' || currChar == ']' || currChar == ':' || currChar == '(' || currChar == ')' || currChar == '{' || currChar == '}' || currChar == '=' || currChar == '+' || currChar == '-' || currChar == '*' || currChar == '/')
 	  {
 		  if ((currChar == '<' && chNext == '<') || (currChar == '>' && chNext == '>') || (currChar == ':' && chNext == ':') || (currChar == '+' && chNext == '+') || (currChar == '-' && chNext == '-') || (currChar == '=' && chNext == '=') || (currChar == '+' && chNext == '=') || (currChar == '-' && chNext == '=') || (currChar == '*' && chNext == '=') || (currChar == '/' && chNext == '=')) {
@@ -119,13 +158,37 @@ ConsumeState* ConsumeState::nextState()
 			  return _pEatSpecialSingleChars;
 		  }
 	  }
+	  */
 	  //Self Modified Part End
 	testLog("state: eatPunctuator");
     return _pEatPunctuator;
   }
+
   if (!_pIn->good())
     return _pEatWhitespace;
   throw(std::logic_error("invalid type"));
+}
+
+bool Scanner::ConsumeState::isOneCharToken(std::string tok)
+{
+	for (size_t i = 0; i < _oneCharTokens.size(); ++i)
+		if (_oneCharTokens[i] == tok)
+			return true;
+	return false;
+}
+
+bool Scanner::ConsumeState::isTwoCharToken(std::string tok)
+{
+	for (size_t i = 0; i < _twoCharTokens.size(); ++i)
+		if (_twoCharTokens[i] == tok)
+			return true;
+	return false;
+}
+
+std::string Scanner::ConsumeState::makeString(int ch)
+{
+	std::string temp;
+	return temp += ch;
 }
 
 
@@ -174,10 +237,8 @@ public:
         return;
       currChar = _pIn->get();
     } while (currChar != '*' || _pIn->peek() != '/');
-	//currChar = _pIn->get();
-	token += currChar;
-    currChar = _pIn->get();
-	token += currChar;
+	token += currChar; currChar = _pIn->get();
+	token += currChar; currChar = _pIn->get();
   }
 };
 
