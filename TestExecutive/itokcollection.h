@@ -36,6 +36,7 @@ struct ITokCollection
   virtual size_t find(const std::string& tok)=0;
   virtual void push_back(const std::string& tok)=0;
   virtual bool remove(const std::string& tok)=0;
+  virtual bool isComment(const std::string& tok)=0;
   virtual bool remove(size_t i)=0;
   virtual void toLower()=0;
   virtual void trimFront()=0;

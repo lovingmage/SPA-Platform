@@ -19,17 +19,16 @@
  * and returns words from the stream in the order encountered.  Quoted
  * strings and certain punctuators and newlines are returned as single tokens.
  *
- * This is a new version, based on the State Design Pattern.  Older versions
- * exist, based on an informal state machine design.
+ * This is a new version, based on the State Design Pattern.  
  *
  * Build Process:
  * --------------
- * Required Files: Tokenizer.h, Tokenizer.cpp, Utilities.h, Utilities.cpp
+ * Required Files: Tokenizer.h, Tokenizer.cpp
  * Build Command: devenv Tokenizer.sln /rebuild debug
  *
  * Maintenance History:
  * --------------------
- * ver 0.4 : 04 Feb 2016
+ * ver 0.4 : 84 Feb 2016
  * - Return quoted strings as single token.  Handle \" and \'correctly.
  * - Converting eatNewLine() to eatSpecialTokens() - see below
  * - Return [, ], {, }, (, ), <, >, :, ; as single character tokens
@@ -49,9 +48,13 @@
  * ver 0.1 : 29 Jan 2016
  * - start up Tokenizer project
  *
+ * Planned Additions and Changes:
+ * ------------------------------
+ * - none yet
  */
 #include <iosfwd>
 #include <string>
+#include <vector>
 
 namespace Scanner
 {
@@ -66,8 +69,7 @@ namespace Scanner
     std::string getTok();
     bool canRead();
 	static void reset();
-	    void setSpecialTokens(const std::string& commaSeparatedString);
-
+	static void setSpecialChars(std::vector<std::string> OneCharList, std::vector<std::string> PairCharList);
   private:
     ConsumeState* pConsumer;
   };

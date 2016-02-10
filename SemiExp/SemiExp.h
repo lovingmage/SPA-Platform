@@ -37,6 +37,7 @@
 * - Add the function to extract one token when a newline start with '#'
 * -	Fixed the bugs when perform ConsumeState, pointers problems
 * - Add the function to handle the key word public, private and protected
+* - Implement the methods defined in interface ITOCKcollection.
 * ver 0.3 : 03 Feb 2016
 * - Add the function to support for loops, which will keep the semicolons
 *	within the for loops.
@@ -57,9 +58,7 @@
 *
 * Planned Additions and Changes:
 * ------------------------------
-* - add public :, protected :, private : as terminators
-* - move creation of tokenizer into semiExp constructor so
-*   client doesn't have to write that code.
+* - none yet
 */
 
 #include <vector>

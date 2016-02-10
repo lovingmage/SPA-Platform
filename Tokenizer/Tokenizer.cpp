@@ -15,7 +15,6 @@
 #include <cctype>
 #include <string>
 #include <vector>
-#include "../Utilities/Utilities.h"
 
 using Token = std::string;
 
@@ -28,7 +27,6 @@ namespace Scanner
     ConsumeState();
     virtual ~ConsumeState();
     void attach(std::istream* pIn) { _pIn = pIn; }
-	void setSpecialTokens(const std::string& commaSeparatedString);
     virtual void eatChars() = 0;
     void consumeChars() {
       _pState->eatChars();
@@ -40,8 +38,8 @@ namespace Scanner
     ConsumeState* nextState();
 	bool isOneCharToken(std::string tok);
 	bool isTwoCharToken(std::string tok);
-	std::string makeString(int ch);
 	static void reset();
+	static void setSpecialChars(std::vector<std::string> OneCharList, std::vector<std::string> PairCharList);
 
   protected:
 
@@ -85,14 +83,204 @@ ConsumeState* ConsumeState::_pEatAlphanum = nullptr;
 ConsumeState* ConsumeState::_pEatNewline;
 std::vector<std::string> ConsumeState::SpecialCharToken =
 {
-	"\n", "<", ">", "{", "}", "[", "]", "(", ")", ":", "=", "+", "-", "*", "."
+	"\n", "<", ">", "{", "}", "[", "]", "(", ")", ":", "=", "+", "-", "*"
 };
 std::vector<std::string> ConsumeState::SpecialCharPairToken =
 {
 	"<<", ">>", "::", "++", "--", "==", "+=", "-=", "*=", "/="
 };
+//----< print out testing Logs >--------------------------------------
 
 void testLog(const std::string& msg);
+
+
+class EatWhitespace : public ConsumeState
+{
+public:
+	virtual void eatChars()
+	{
+		token.clear();
+		//std::cout << "\n  eating whitespace";
+		do {
+			if (!_pIn->good())  // end of stream
+				return;
+			currChar = _pIn->get();
+		} while (std::isspace(currChar) && currChar != '\n');
+	}
+};
+
+class EatCppComment : public ConsumeState
+{
+public:
+	virtual void eatChars()
+	{
+		token.clear();
+		//std::cout << "\n  eating C++ comment";
+		do {
+			token += currChar;
+			if (!_pIn->good())  // end of stream
+				return;
+			currChar = _pIn->get();
+		} while (currChar != '\n');
+	}
+};
+
+class EatCComment : public ConsumeState
+{
+public:
+	virtual void eatChars()
+	{
+		token.clear();
+		//std::cout << "\n  eating C comment";
+		do {
+			token += currChar;
+			if (!_pIn->good())  // end of stream
+				return;
+			currChar = _pIn->get();
+		} while (currChar != '*' || _pIn->peek() != '/');
+		token += currChar; currChar = _pIn->get();
+		token += currChar; currChar = _pIn->get();
+	}
+};
+
+class EatPunctuator : public ConsumeState
+{
+public:
+	virtual void eatChars()
+	{
+		token.clear();
+		//std::cout << "\n  eating punctuator";
+		do {
+			token += currChar;
+			if (!_pIn->good())  // end of stream
+				return;
+			currChar = _pIn->get();
+		} while (ispunct(currChar));
+	}
+};
+
+
+class EatQoutedString : public ConsumeState
+{
+public:
+	virtual void eatChars()
+	{
+		token.clear();
+		//std::cout << "\n  eating qouted string";
+		do {
+
+			token += currChar;
+			if (!_pIn->good())// end of stream
+				return;
+			currChar = _pIn->get();
+		} while (currChar != 34 && currChar != 36);
+		token += currChar;
+		currChar = _pIn->get();
+	}
+};
+
+class EatSpecialStringChars : public ConsumeState
+{
+public:
+	virtual void eatChars()
+	{
+		token.clear();
+		//std::cout << "\n  eating special one char";
+		token += currChar;
+		if (!_pIn->good())// end of stream
+			return;
+		currChar = _pIn->get();
+	}
+};
+
+class EatSpecialCharPairs : public ConsumeState
+{
+public:
+	virtual void eatChars()
+	{
+		token.clear();
+		//std::cout << "\n  eating special pariwise char;
+		int count = 2;
+		do {
+			token += currChar;
+			if (!_pIn->good())// end of stream
+				return;
+			currChar = _pIn->get();
+		} while (--count);
+	}
+};
+
+class EatAlphanum : public ConsumeState
+{
+public:
+	virtual void eatChars()
+	{
+		token.clear();
+		//std::cout << "\n  eating alphanum";
+		do {
+			token += currChar;
+			if (!_pIn->good())  // end of stream
+				return;
+			currChar = _pIn->get();
+		} while (isalnum(currChar));
+	}
+};
+
+class EatNewline : public ConsumeState
+{
+public:
+	virtual void eatChars()
+	{
+		token.clear();
+		//std::cout << "\n  eating alphanum";
+		token += currChar;
+		if (!_pIn->good())  // end of stream
+			return;
+		currChar = _pIn->get();
+	}
+};
+
+//----< Constructor of ConsumeState >--------------------------------------
+
+ConsumeState::ConsumeState()
+{
+	if (first)
+	{
+		first = false;
+		_pEatAlphanum = new EatAlphanum();
+		_pEatCComment = new EatCComment();
+		_pEatCppComment = new EatCppComment();
+		_pEatPunctuator = new EatPunctuator();
+		_pEatSpecialSingleChars = new EatSpecialStringChars();
+		_pEateSpecialCharPairs = new EatSpecialCharPairs();
+		_pEateQoutedString = new EatQoutedString();
+		_pEatWhitespace = new EatWhitespace();
+		_pEatNewline = new EatNewline();
+		_pState = _pEatWhitespace;
+	}
+}
+
+//----< Destructor of ConsumeState >--------------------------------------
+
+ConsumeState::~ConsumeState()
+{
+	static bool first = true;
+	if (first)
+	{
+		first = false;
+		delete _pEatAlphanum;
+		delete _pEatCComment;
+		delete _pEatCppComment;
+		delete _pEatPunctuator;
+		delete _pEatSpecialSingleChars;
+		delete _pEateSpecialCharPairs;
+		delete _pEateQoutedString;
+		delete _pEatWhitespace;
+		delete _pEatNewline;
+	}
+}
+
+//----< Judge the State of Nextstate >--------------------------------
 
 ConsumeState* ConsumeState::nextState()
 {
@@ -128,27 +316,27 @@ ConsumeState* ConsumeState::nextState()
     return _pEatAlphanum;
   }
 
+  if (currChar == 34 || currChar == 36)
+  {	  // whether currChar is ' or currChar is "
+	  testLog("state: eatQoutedString");
+	  return _pEateQoutedString;
+  }
+
+  std::string temp; temp += currChar;
+  if (isOneCharToken(temp))
+  {
+	  std::string CharPair; CharPair += currChar;
+	  CharPair.push_back(chNext);
+	  // Get a string contains current char and next char;
+	  if (isTwoCharToken(CharPair))
+	  {
+		  return _pEateSpecialCharPairs;
+	  }
+	  return _pEatSpecialSingleChars;
+  }
+
   if (ispunct(currChar))
   {
-	  
-	  if (currChar == 34 || currChar == 36)
-	  {
-		  testLog("state: eatQoutedString");
-		  return _pEateQoutedString;
-	  }
-
-	  if (isOneCharToken(makeString(currChar)))
-	  {
-		  std::string CharPair = makeString(currChar);
-		  CharPair.push_back(chNext);
-
-		  if (isTwoCharToken(CharPair))
-		  {
-			  return _pEateSpecialCharPairs;
-		  }
-		  return _pEatSpecialSingleChars;
-	  }
-
 	testLog("state: eatPunctuator");
     return _pEatPunctuator;
   }
@@ -158,242 +346,63 @@ ConsumeState* ConsumeState::nextState()
   throw(std::logic_error("invalid type"));
 }
 
+//----< judge if the current char is Special Char >-----------------------------
+
 bool Scanner::ConsumeState::isOneCharToken(std::string tok)
 {
-	for (size_t i = 0; i < SpecialCharToken.size(); ++i)
-		if (SpecialCharToken[i] == tok)
+	for (size_t count = 0; count < SpecialCharToken.size(); ++count)
+		if (SpecialCharToken[count] == tok)
 			return true;
 	return false;
 }
+
+//----< judge if the current char is Special Char Pairs >-----------------------------
 
 bool Scanner::ConsumeState::isTwoCharToken(std::string tok)
 {
-	for (size_t i = 0; i < SpecialCharPairToken.size(); ++i)
-		if (SpecialCharPairToken[i] == tok)
+	for (size_t count = 0; count < SpecialCharPairToken.size(); ++count)
+		if (SpecialCharPairToken[count] == tok)
 			return true;
 	return false;
 }
 
-std::string Scanner::ConsumeState::makeString(int ch)
-{
-	std::string temp;
-	return temp += ch;
-}
+
+//----< Reset the flag first into True >--------------------------------------------
 
 void Scanner::ConsumeState::reset()
 {
-	first = first = true;
+	first = true;
+}
+
+//----< Used to Set Special Chars and Char Pairs >----------------------------------
+
+void Scanner::ConsumeState::setSpecialChars(std::vector<std::string> OneCharList, std::vector<std::string> PairCharList)
+{
+	SpecialCharToken = OneCharList;
+	SpecialCharPairToken = PairCharList;
 }
 
 
-
-class EatWhitespace : public ConsumeState
-{
-public:
-  virtual void eatChars()
-  {
-    token.clear();
-    //std::cout << "\n  eating whitespace";
-    do {
-      if (!_pIn->good())  // end of stream
-        return;
-      currChar = _pIn->get();
-    } while (std::isspace(currChar) && currChar != '\n');
-  }
-};
-
-class EatCppComment : public ConsumeState
-{
-public:
-  virtual void eatChars()
-  {
-    token.clear();
-    //std::cout << "\n  eating C++ comment";
-    do {
-	  token += currChar;
-      if (!_pIn->good())  // end of stream
-        return;
-      currChar = _pIn->get();
-    } while (currChar != '\n');
-  }
-};
-
-class EatCComment : public ConsumeState
-{
-public:
-  virtual void eatChars()
-  {
-    token.clear();
-    //std::cout << "\n  eating C comment";
-    do {
-	token += currChar;
-      if (!_pIn->good())  // end of stream
-        return;
-      currChar = _pIn->get();
-    } while (currChar != '*' || _pIn->peek() != '/');
-	token += currChar; currChar = _pIn->get();
-	token += currChar; currChar = _pIn->get();
-  }
-};
-
-class EatPunctuator : public ConsumeState
-{
-public:
-  virtual void eatChars()
-  {
-    token.clear();
-    //std::cout << "\n  eating punctuator";
-    do {
-      token += currChar;
-      if (!_pIn->good())  // end of stream
-        return;
-      currChar = _pIn->get();
-    } while (ispunct(currChar));
-  }
-};
-
-
-class EatQoutedString : public ConsumeState
-{
-public:
-	virtual void eatChars()
-	{
-		token.clear();
-		do {
-
-			token += currChar;
-			if (!_pIn->good())
-				return;
-			currChar = _pIn->get();
-		} while (currChar != 34 && currChar != 36);
-		token += currChar;
-		currChar = _pIn->get();	
-	}
-};
-
-class EatSpecialStringChars : public ConsumeState
-{
-public:
-	virtual void eatChars()
-	{
-		token.clear();
-		token += currChar;
-		if (!_pIn->good())
-			return;
-		currChar = _pIn->get();
-	}
-};
-
-class EatSpecialCharPairs : public ConsumeState
-{
-public:
-	virtual void eatChars()
-	{
-		token.clear();
-		int Jishujun = 2;
-		do {
-			token += currChar;
-			if (!_pIn->good())
-				return;
-			currChar = _pIn->get();
-		} while (--Jishujun);
-	}
-};
-//Self Modified Part Ended
-
-class EatAlphanum : public ConsumeState
-{
-public:
-  virtual void eatChars()
-  {
-    token.clear();
-    //std::cout << "\n  eating alphanum";
-    do {
-      token += currChar;
-      if (!_pIn->good())  // end of stream
-        return;
-      currChar = _pIn->get();
-    } while (isalnum(currChar));
-  }
-};
-
-class EatNewline : public ConsumeState
-{
-public:
-  virtual void eatChars()
-  {
-    token.clear();
-    //std::cout << "\n  eating alphanum";
-    token += currChar;
-    if (!_pIn->good())  // end of stream
-      return;
-    currChar = _pIn->get();
-  }
-};
-
-ConsumeState::ConsumeState()
-{
-  if (first)
-  {
-    first = false;
-    _pEatAlphanum = new EatAlphanum();
-    _pEatCComment = new EatCComment();
-    _pEatCppComment = new EatCppComment();
-    _pEatPunctuator = new EatPunctuator();
-	_pEatSpecialSingleChars = new EatSpecialStringChars();
-	_pEateSpecialCharPairs = new EatSpecialCharPairs();
-	_pEateQoutedString = new EatQoutedString();
-    _pEatWhitespace = new EatWhitespace();
-    _pEatNewline = new EatNewline();
-    _pState = _pEatWhitespace;
-  }
-}
-
-ConsumeState::~ConsumeState()
-{
-  static bool first = true;
-  if (first)
-  {
-    first = false;
-    delete _pEatAlphanum;
-    delete _pEatCComment;
-    delete _pEatCppComment;
-    delete _pEatPunctuator;
-	delete _pEatSpecialSingleChars;
-	delete _pEateSpecialCharPairs;
-	delete _pEateQoutedString;
-    delete _pEatWhitespace;
-    delete _pEatNewline;
-  }
-}
-
-void Scanner::ConsumeState::setSpecialTokens(const std::string & commaSeparatedString)
-{
-	std::vector<Token> result = Utilities::StringHelper::split(commaSeparatedString);
-	SpecialCharToken.clear();
-	SpecialCharPairToken.clear();
-	for (std::string item : result)
-	{
-		if (item.size() == 1 || item == "\n")
-			SpecialCharToken.push_back(item);
-		if (item.size() >= 2)
-			SpecialCharPairToken.push_back(item);
-	}
-}
+//----< Constructor of Toker >------------------------------------------------------------
 
 Toker::Toker() : pConsumer(new EatWhitespace()) {}
 
+//----< Destructor of Toker >------------------------------------------------------------
+
 Toker::~Toker() { delete pConsumer; }
+
+//----< Reset the Toker >----------------------------------------------------------------
 
 void Toker::reset()
 {
 	ConsumeState::reset();
 }
 
-void Toker::setSpecialTokens(const std::string& commaSeparatedTokens)
+void Toker::setSpecialChars(std::vector<std::string> OneCharList, std::vector<std::string> PairCharList)
 {
-	pConsumer->setSpecialTokens(commaSeparatedTokens);
+	ConsumeState::setSpecialChars(OneCharList, PairCharList);
 }
+//----< Attach a file stream into Toker >----------------------------------------------
 
 bool Toker::attach(std::istream* pIn)
 {
@@ -404,6 +413,7 @@ bool Toker::attach(std::istream* pIn)
   }
   return false;
 }
+//----< Read words from the filestream >-----------------------------------------------
 
 std::string Toker::getTok()
 {
@@ -413,12 +423,16 @@ std::string Toker::getTok()
       return "";
     pConsumer->consumeChars();
     if (pConsumer->hasTok())
-      break;
+      break;//end of file stream
   }
   return pConsumer->getTok();
 }
 
+//----< Test Readable of the file stream >----------------------------------------------
+
 bool Toker::canRead() { return pConsumer->canRead(); }
+
+//----< Test Log print out >------------------------------------------------------------
 
 void testLog(const std::string& msg)
 {

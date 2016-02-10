@@ -21,14 +21,19 @@
 * Build Process:
 * --------------
 * Required Files:
-*   SemiExp.h, SemiExp.cpp, Tokenizer.h, Tokenizer.cpp, itokcollection.h
+*   SemiExp.h, SemiExp.cpp, Tokenizer.h, Tokenizer.cpp, itokcollection.h, 
+*	TestExecutive.cpp, TestExecutive.h
 *
 * Build Command: devenv TestExecutive.sln /rebuild debug
-
-Maintenance History:
-====================
-ver 0.1 : 08 Feb 16
-- Start the project
+*
+* Maintenance History:
+* ====================
+* ver 0.1 : 08 Feb 16
+* - Start the project
+*
+* Planned Additions and Changes:
+* ------------------------------
+* - none yet
 */
 #include "../SemiExp/SemiExp.h"
 #include "../Tokenizer/Tokenizer.h"

@@ -23,6 +23,8 @@ using namespace Scanner;
 
 SemiExp::SemiExp(Toker* pToker) : _pToker(pToker) {}
 
+//----< get tokens into _tokens >-----------------------
+
 bool SemiExp::get()
 {
   if (_pToker == nullptr)
@@ -37,14 +39,14 @@ bool SemiExp::get()
 		continue;
 
 	_tokens.push_back(token);
-
+	//handle # when # is the first in newline
 	if (token == "\n" && find("#") != length()) {
 		trimFront();
 		if (_tokens[0] == "#") {
 			return true;
 		}	
 	}
-
+	//handle key words private, public, protected
 	if (token == "private" || token == "public" || token == "protected") {
 		token = _pToker->getTok();
 		if (token == ":") {
@@ -56,8 +58,7 @@ bool SemiExp::get()
 			return true;
 		}
 		else { _tokens.push_back(token); }
-		
-	}
+	}//handle for loops, ignore semicolons within for loops
 	if (token == "for") {
 		token = _pToker->getTok();
 		while (token != "{" && token!="\n") {
@@ -66,7 +67,7 @@ bool SemiExp::get()
 		}
 		_tokens.push_back(token);
 	}
-   
+    // Terminators List
 	if (token == "{" || token == "}" || token == ";")
       return true;
   }
@@ -81,6 +82,8 @@ void SemiExp::trimFront()
 		remove(0);
 }
 
+//----< switch tokens into lower cases >-----------------------
+
 void SemiExp::toLower()
 {
 	for (size_t i = 0; i<length(); ++i)
@@ -91,6 +94,8 @@ void SemiExp::toLower()
 		}
 	}
 }
+
+//----< Access elements in tokens by using operator [] >-------
 
 Token SemiExp::operator[](size_t n)
 {
@@ -123,6 +128,8 @@ bool SemiExp::remove(size_t i)
 	return true;
 }
 
+//----< judge if current token is comment >---------------------
+
 bool SemiExp::isComment(const std::string& tok)
 {
 	if (tok.length() < 2) return false;
@@ -130,6 +137,8 @@ bool SemiExp::isComment(const std::string& tok)
 	if (tok[1] == '/' || tok[1] == '*') return true;
 	return false;
 }
+
+//----< find toks in current tokens >---------------------------
 
 size_t SemiExp::find(const std::string& tok)
 {
@@ -139,10 +148,14 @@ size_t SemiExp::find(const std::string& tok)
 	return length();
 }
 
+//----< return the length of current token >---------------------
+
 size_t SemiExp::length()
 {
   return _tokens.size();
 }
+
+//----< print out tokens >--------------------------------------
 
 void SemiExp::show()
 {
@@ -153,13 +166,18 @@ void SemiExp::show()
   std::cout << "\n";
 }
 
+//----< clean current tokens >--------------------------------
+
 void SemiExp::clear() { _tokens.clear(); }
+
+//----< push new toks into tokens >---------------------------
 
 void SemiExp::push_back(const std::string& tok)
 {
 	_tokens.push_back(tok);
 }
 
+//----<	Test Stub >-------------------------------------------
 
 #ifdef TEST_SEMIEXP
 int main()
