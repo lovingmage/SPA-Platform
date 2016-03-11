@@ -1,0 +1,3 @@
+﻿  Parser.cpp
+c:\users\skiph\desktop\pr2\parser\actionsandrules.h(326): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+  Parser.vcxproj -> C:\Users\skiph\Desktop\pr2\x64\Debug\Parser.exe
