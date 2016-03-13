@@ -1,0 +1,19 @@
+static int main(){
+	for {
+		if(i>5){
+			std::cout << i;
+		}
+	}
+
+	try{}
+
+	switch{}
+	while {}
+	
+}
+
+
+int function(){
+
+	int j = 0;
+}
