@@ -64,6 +64,7 @@ public:
   ~ConfigParseToConsole();
   bool Attach(const std::string& name, bool isFile=true);
   Parser* Build();
+  ASTree& getASTree() { return pRepo->getTree(); }
 
 private:
   // Builder must hold onto all the pieces

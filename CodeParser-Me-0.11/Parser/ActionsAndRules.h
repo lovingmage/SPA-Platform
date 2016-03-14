@@ -208,15 +208,12 @@ public:
 	linecount = p_Repos->lineCount() - elem.lineCount + 1;
 	p_Repos->getTree().InsertElement(elem.name, elem.type, linecount);
 	p_Repos->getTree().getParent();
-
+	/*
 	if (p_Repos->getTree().GetCurrElement().type == "Namespace" && !p_Repos->Toker()->canRead()) {
 		p_Repos->getTree().ShowTree();
 		return;
 	}
-	
-
-
-	
+	*/
   }
 };
 
@@ -308,7 +305,6 @@ public:
 		elem.name = name;
 		elem.lineCount = p_Repos->lineCount();
 		p_Repos->scopeStack().push(elem);
-		//p_Repos->astTree().PushElement(elem.type,elem.name,elem.lineCount);
 	}
 };
 
@@ -344,8 +340,8 @@ public:
 		if (tc[tc.length() - 1] == "{")
 		{
 			const static std::string keys[]
-				= { "for", "while", "switch", "if", "catch", "namespace","try", "else"};
-			for (int i = 0; i < 8; ++i)
+				= { "for", "while", "switch", "if", "catch", "namespace","try", "else", "struct", "class"};
+			for (int i = 0; i < 10; ++i)
 			{
 				size_t len = tc.find(keys[i]);
 				if (len < tc.length())
@@ -376,11 +372,26 @@ public:
 	{
 		// pop anonymous scope
 		p_Repos->scopeStack().pop();
-
-		// push scopes
-		std::string name = (*pTc)[1];
+		std::string name;
+		std::string type;
+		if ((pTc->find("struct")) < pTc->length())
+		{
+			type = "struct";
+			name = (*pTc)[1];
+		}
+		else if ((pTc->find("class")) < pTc->length())
+		{
+			type = "Class";
+			name = (*pTc)[1];
+		}
+		else
+		{
+			name = (*pTc)[1];
+			type = "Scope";
+		}
+		
 		element elem;
-		elem.type = "scope";
+		elem.type = type;
 		elem.name = name;
 		elem.lineCount = p_Repos->lineCount();
 		p_Repos->scopeStack().push(elem);
@@ -405,25 +416,6 @@ public:
 	}
 };
 
-
-
-///////////////////////////////////////////////////////////////
-// action to send semi-expression that starts a function def
-// to console
-
-//class PrintStaticFunction : public IAction
-//{
-//	Repository* p_Repos;
-//public:
-//	PrintStaticFunction(Repository* pRepos)
-//	{
-//		p_Repos = pRepos;
-//	}
-//	void doAction(ITokCollection*& pTc)
-//	{
-//		std::cout << "\n Static Function: " << pTc->show().c_str();
-//	}
-//};
 
 ///////////////////////////////////////////////////////////////
 // action to send signature of a function def to console

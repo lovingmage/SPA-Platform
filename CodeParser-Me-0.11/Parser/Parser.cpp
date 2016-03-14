@@ -72,7 +72,7 @@ void IRule::doActions(ITokCollection*& pTokColl)
 
 #include "../FileSystem-Windows/FileSystemDemo/FileSystem.h"
 
-#ifdef TEST_PARSER
+#ifdef TEST_PARSE
 
 #include <queue>
 #include <string>

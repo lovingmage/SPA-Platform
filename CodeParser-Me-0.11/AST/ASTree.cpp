@@ -29,16 +29,16 @@ void ASTree::InsertElement(std::string type, std::string name, size_t linecount)
 
 //show the whole tree with infor: type, name, lineCount and complexity
 void ASTree::ShowTree() {
-	tree<Element>::iterator start = astree.begin();
+	tree<Element>::iterator iterStart = astree.begin();
 	tree<Element>::iterator end = astree.end();
-	while (start != end) {
-		for (int i = 0; i < astree.depth(start); ++i)
+	while (iterStart != end) {
+		for (int i = 0; i < astree.depth(iterStart); ++i)
 			std::cout << "	";
-		if ((*start).type == "Namespace")
-			std::cout << (*start).type << ", " << (*start).name << std::endl;
+		if ((*iterStart).type == "Namespace")
+			std::cout << (*iterStart).type << ", " << (*iterStart).name << std::endl;
 		else
-			std::cout <<std::setw(10)<<std::setfill('-')<< "-> (" <<(*start).type << ", " << (*start).name << ", " << (*start).lineCount << ", " << getComplexity(start) << ")" << std::endl;
-		++start;
+			std::cout <<std::setw(10)<<std::setfill('-')<< "-> (" <<(*iterStart).type << ", " << (*iterStart).name << ", " << (*iterStart).lineCount << ", " << getComplexity(iterStart) << ")" << std::endl;
+		++iterStart;
 	}
 }
 
