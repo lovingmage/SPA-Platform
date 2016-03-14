@@ -17,6 +17,7 @@ public:
 	MetricAnalysis(std::string AnalyPath);
 	~MetricAnalysis();
 	void doAnalysis();
+	void attachFile(std::string analyfile);
 private:
 	ConfigParseToConsole configure;
 	std::string fileSpec;

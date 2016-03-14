@@ -53,9 +53,15 @@ void MetricAnalysis::doAnalysis()
 	tempTree->ShowTree();
 }
 
+//Attach file to fileSpec in the metricAnalysis Class
+void MetricAnalysis::attachFile(std::string analyfile)
+{
+	fileSpec = analyfile;
+}
+
 //----< test stub >--------------------------------------------
 
-#define TEST_METRIC
+//#define TEST_METRIC
 #ifdef TEST_METRIC
 
 #define Util StringHelper
