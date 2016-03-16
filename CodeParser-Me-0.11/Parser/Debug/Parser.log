@@ -1,1 +1,18 @@
-﻿
+﻿  Parser.cpp
+c:\users\skiph\onedrive\documents\github\spa-platform\codeparser-me-0.11\parser\actionsandrules.h(436): warning C4018: '<': signed/unsigned mismatch
+  ConfigureParser.cpp
+c:\users\skiph\onedrive\documents\github\spa-platform\codeparser-me-0.11\parser\actionsandrules.h(436): warning C4018: '<': signed/unsigned mismatch
+  ActionsAndRules.cpp
+  Tokenizer.cpp
+  SemiExp.cpp
+  ScopeStack.cpp
+  FileSystem.cpp
+  Generating Code...
+ConfigureParser.obj : error LNK2019: unresolved external symbol "public: __thiscall ASTree::ASTree(void)" (??0ASTree@@QAE@XZ) referenced in function "public: __thiscall Repository::Repository(class Scanner::Toker *)" (??0Repository@@QAE@PAVToker@Scanner@@@Z)
+ConfigureParser.obj : error LNK2001: unresolved external symbol "public: virtual void __thiscall ASTree::AppendChild(void)" (?AppendChild@ASTree@@UAEXXZ)
+ConfigureParser.obj : error LNK2001: unresolved external symbol "public: virtual void __thiscall ASTree::InsertElement(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >,class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >,unsigned int)" (?InsertElement@ASTree@@UAEXV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@0I@Z)
+ConfigureParser.obj : error LNK2001: unresolved external symbol "public: virtual void __thiscall ASTree::getParent(void)" (?getParent@ASTree@@UAEXXZ)
+ConfigureParser.obj : error LNK2001: unresolved external symbol "public: virtual unsigned int __thiscall ASTree::getComplexity(class tree<struct Element,class std::allocator<class tree_node_<struct Element> > >::pre_order_iterator)" (?getComplexity@ASTree@@UAEIVpre_order_iterator@?$tree@UElement@@V?$allocator@V?$tree_node_@UElement@@@@@std@@@@@Z)
+ConfigureParser.obj : error LNK2001: unresolved external symbol "public: virtual void __thiscall ASTree::ShowTree(void)" (?ShowTree@ASTree@@UAEXXZ)
+MSVCRTD.lib(exe_main.obj) : error LNK2019: unresolved external symbol _main referenced in function "int __cdecl invoke_main(void)" (?invoke_main@@YAHXZ)
+C:\Users\skiph\OneDrive\Documents\GitHub\SPA-Platform\CodeParser-Me-0.11\Debug\Parser.exe : fatal error LNK1120: 7 unresolved externals

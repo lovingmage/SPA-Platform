@@ -1,8 +1,18 @@
-#include "ASTree.h"
+///////////////////////////////////////////////////////////////////////
+// ASTree.h - Abstract Syntax Tree                                   //
+// ver 1.1                                                           //
+// Language:    C++, Visual Studio 2015                              //
+// Application: Parser component, CIS687 - Object Oriented Design    //
+// Author:		Chenghong Wang, Syracuse University					 //
+//				cwang132@syr.edu									 //
+//																	 //
+///////////////////////////////////////////////////////////////////////
 
+#include "ASTree.h"
 
 //constructor without argument to initialize AST with namespace as its type
 ASTree::ASTree() {
+	Element _currentElement;
 	_currentElement.type = "Namespace";
 	_currentElement.name = "Global";
 	_currentElement.lineCount = 0;
@@ -15,7 +25,6 @@ void ASTree::AppendChild() {
 
 	Element _tempElement;
 	currItr = astree.append_child(currItr, _tempElement);
-	//_currentElement = _nextElement;
 
 }
 
@@ -46,7 +55,6 @@ void ASTree::ShowTree() {
 //make the current pointer point to its parent
 void ASTree::getParent() {
 	currItr = astree.parent(currItr);
-	_currentElement = *currItr;
 }
 
 

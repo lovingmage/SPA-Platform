@@ -2,12 +2,13 @@
 #define CONFIGUREPARSER_H
 /////////////////////////////////////////////////////////////////////
 //  ConfigureParser.h - builds and configures parsers              //
-//  ver 2.1                                                        //
+//  ver 1.1                                                        //
+// Language:    C++, Visual Studio 2015                            //
+// Application: Parser Config , CIS687 Object Oriented  Design     //
 //                                                                 //
-//  Lanaguage:     Visual C++ 2005                                 //
-//  Platform:      Dell Dimension 9150, Windows XP SP2             //
-//  Application:   Prototype for CSE687 Pr1, Sp06                  //
-//  Author:        Jim Fawcett, CST 2-187, Syracuse University     //
+// Author:		Chenghong Wang, Syracuse University				   //
+//				cwang132@syr.edu								   //
+// Source:        Jim Fawcett, CST 4-187, Syracuse University      //
 //                 (315) 443-3948, jfawcett@twcny.rr.com           //
 /////////////////////////////////////////////////////////////////////
 /*
@@ -22,27 +23,21 @@
   conConfig.Build();
   conConfig.Attach(someFileName);
 
-  Build Process:
-  ==============
-  Required files
-    - ConfigureParser.h, ConfigureParser.cpp, Parser.h, Parser.cpp,
-      ActionsAndRules.h, ActionsAndRules.cpp,
-      SemiExpression.h, SemiExpression.cpp, tokenizer.h, tokenizer.cpp
+  Required Files:
+  ===============
+  SemiExp.h, Tokenizer.h, Parser.h, ActionsAndRules.h, ConfigureParser.cpp,
+  ConfigureParser.h, SemiExp.cpp, Tokenizer.cpp, Parser.cpp, ActionsAndRules.cpp, 
+  ConfigureParser.cpp, ConfigureParser.h
   Build commands (either one)
-    - devenv Project1HelpS06.sln
-    - cl /EHsc /DTEST_PARSER ConfigureParser.cpp parser.cpp \
-         ActionsAndRules.cpp \
-         semiexpression.cpp tokenizer.cpp /link setargv.obj
+  - devenv ConfigureParser.sln
+  - cl /EHsc /DTEST_PARSER Parser.cpp SemiExp.cpp Tokenizer.cpp \
+  ActionsAndRules.cpp ASTree.cpp ConfigureParser.cpp /link setargv.obj
 
   Maintenance History:
   ====================
-  ver 2.1 : 19 Feb 16
-  - Added PrintFunction action to FunctionDefinition rule
-  ver 2.0 : 01 Jun 11
-  - Major revisions to begin building a strong code analyzer
-  ver 1.1 : 01 Feb 06
-  - cosmetic changes to ConfigureParser.cpp
-  ver 1.0 : 12 Jan 06
+  ver 1.1 : 08 March 2016
+  - Add new rules detect scope in ConfigureParser
+  ver 1.0 : 05 March 2016
   - first release
 
 */

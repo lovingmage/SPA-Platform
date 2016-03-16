@@ -2,7 +2,7 @@
 #define TOKENIZER_H
 ///////////////////////////////////////////////////////////////////////
 // Tokenizer.h - read words from a std::stream                       //
-// ver 0.4                                                          //
+// ver 0.4                                                           //
 // Language:    C++, Visual Studio 2015                              //
 // Application: Parser component, CIS687 - Object Oriented Design    //
 // Author:		Chenghong Wang, Syracuse University					 //

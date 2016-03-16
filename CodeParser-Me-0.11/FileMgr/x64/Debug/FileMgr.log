@@ -1,4 +1,1 @@
-﻿  FileMgr.cpp
-  FileSystem.cpp
-  Generating Code...
-  FileMgr.vcxproj -> C:\Users\skiph\OneDrive\Documents\GitHub\SPA-Platform\CodeParser-Me-0.11\x64\Debug\FileMgr.lib
+﻿C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V140\Microsoft.CppClean.targets(76,5): warning : The process cannot access the file 'c:\users\skiph\onedrive\documents\github\spa-platform\codeparser-me-0.11\filemgr\x64\debug\filesystem.obj' because it is being used by another process.

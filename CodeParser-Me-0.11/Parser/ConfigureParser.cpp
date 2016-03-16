@@ -1,11 +1,12 @@
 /////////////////////////////////////////////////////////////////////
 //  ConfigureParser.cpp - builds and configures parsers            //
-//  ver 2.1                                                        //
+//  ver 1.1                                                        //
+// Language:    C++, Visual Studio 2015                            //
+// Application: Parser Config , CIS687 Object Oriented  Design     //
 //                                                                 //
-//  Lanaguage:     Visual C++ 2005                                 //
-//  Platform:      Dell Dimension 9150, Windows XP SP2             //
-//  Application:   Prototype for CSE687 Pr1, Sp06                  //
-//  Author:        Jim Fawcett, CST 2-187, Syracuse University     //
+// Author:		Chenghong Wang, Syracuse University				   //
+//				cwang132@syr.edu								   //
+// Source:        Jim Fawcett, CST 4-187, Syracuse University      //
 //                 (315) 443-3948, jfawcett@twcny.rr.com           //
 /////////////////////////////////////////////////////////////////////
 

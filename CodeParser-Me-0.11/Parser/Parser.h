@@ -1,12 +1,14 @@
 #ifndef PARSER_H
 #define PARSER_H
 /////////////////////////////////////////////////////////////////////
-//  Parser.h - Analyzes C++ language constructs                    //
-//  ver 1.4                                                        //
-//  Language:      Visual C++ 2008, SP1                            //
-//  Platform:      Dell Precision T7400, Vista Ultimate SP1        //
-//  Application:   Prototype for CSE687 Pr1, Sp09                  //
-//  Author:        Jim Fawcett, CST 4-187, Syracuse University     //
+//  Parser.h - package headfile for Parser                         //
+//  ver 1.0                                                        //
+// Language:    C++, Visual Studio 2015                            //
+// Application: Parser file , CIS687 Object Oriented  Design       //
+//                                                                 //
+// Author:		Chenghong Wang, Syracuse University				   //
+//				cwang132@syr.edu								   //
+// Source:        Jim Fawcett, CST 4-187, Syracuse University      //
 //                 (315) 443-3948, jfawcett@twcny.rr.com           //
 /////////////////////////////////////////////////////////////////////
 /*
@@ -32,31 +34,18 @@
   Build Process:
   ==============
   Required files
-    - Parser.h, Parser.cpp, SemiExpression.h, SemiExpression.cpp,
+    - Parser.h, Parser.cpp, SemiExp.h, SemiExp.cpp,
       tokenizer.h, tokenizer.cpp,
       ActionsAndRules.h, ActionsAndRules.cpp,
       ConfigureParser.h, ConfigureParser.cpp
   Build commands (either one)
     - devenv Parser.sln
-    - cl /EHsc /DTEST_PARSER parser.cpp semiexpression.cpp tokenizer.cpp \
+    - cl /EHsc /DTEST_PARSER Parser.cpp SemiExp.cpp Tokenizer.cpp \
          ActionsAndRules.cpp ConfigureParser.cpp /link setargv.obj
 
   Maintenance History:
   ====================
-  ver 1.4 : 15 Feb 16
-  - removed all folding rules code
-  - changed solution folder layout which caused changes in many of the
-    include paths
-  - small modifications to one of the derived actions
-  - now preface (new) Toker and SemiExp with Scanner namespace
-  ver 1.3 : 02 Jun 11
-  - added use of folding rules in get();
-  ver 1.2 : 17 Jan 09
-  - modified to accept pointer to interface ITokCollection instead of
-    SemiExpression
-  ver 1.1 : 17 Sep 07
-  - cosmetic modifications to comments on this page
-  ver 1.0 : 12 Jan 06
+  ver 1.0 : 05 March 2016
   - first release
 
 */

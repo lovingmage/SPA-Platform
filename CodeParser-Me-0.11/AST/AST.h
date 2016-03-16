@@ -1,8 +1,30 @@
+/////////////////////////////////////////////////////////////////////
+//  AST.h - package for the AST interface                          //
+//  ver 1.0                                                        //
+//  Language:      Visual Studio 2015                              //
+//  Application:   Abstract Syntax Tree Interface                  //
+//  Author:		   Chenghong Wang, Syracuse University			   //
+//				     cwang132@syr.edu					           //
+/////////////////////////////////////////////////////////////////////
+/*
+Module Purpose:
+===============
+AST is an interface for abstract syntax tree, it contains some basic 
+Abstract Syntax Tree required methods and been defined as virtual
+functions, like AppendChild(); InsertElement(); getComplexity();, etc.
+This interface can be used in future construction for abstract syntax
+tree structure.
+
+Maintenance History:
+====================
+ver 1.0 : 05 March 2016
+- first release
+*/
 #ifndef AST_H
 #define AST_H
 
 #pragma once
-#include "tree.h"
+#include "tree.hh"
 #include <iostream>
 #include <string>
 
@@ -13,9 +35,6 @@ struct Element
 	size_t lineCount;
 
 };
-
-
-
 
 class IAST {
 public:

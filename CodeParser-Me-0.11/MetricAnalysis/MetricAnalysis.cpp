@@ -1,12 +1,25 @@
+/////////////////////////////////////////////////////////////////////
+//  MetricAnalysis.cpp - MetricAnalysis Package                    //
+//  ver 1.0                                                        //
+// Language:    C++, Visual Studio 2015                            //
+// Application:	MetricExecutive , CIS687 Object Oriented  Design   //
+//                                                                 //
+// Author:		Chenghong Wang, Syracuse University				   //
+//				cwang132@syr.edu								   //
+// Source:        Jim Fawcett, CST 4-187, Syracuse University      //
+//                 (315) 443-3948, jfawcett@twcny.rr.com           //
+/////////////////////////////////////////////////////////////////////
 #include <queue>
 #include <string>
 #include <cctype>
 #include <string>
 #include <iostream>
 #include "MetricAnalysis.h"
+#include "../Utilities/Utilities.h"
 
 using namespace Scanner;
 using namespace Utilities;
+#define Util StringHelper
 
 
 //MetricAnalysis Constructor
@@ -41,7 +54,7 @@ void MetricAnalysis::doAnalysis()
 			std::cout << "\n\n  Parser not built\n\n";
 		}
 		// now that parser is built, use it
-
+		std::cout << "-------------------" << "Start Presenting Functions" << "------------------" << std::endl;
 		while (pParser->next())
 			pParser->parse();
 		std::cout << "\n";
@@ -50,6 +63,8 @@ void MetricAnalysis::doAnalysis()
 	{
 		std::cout << "\n\n    " << ex.what() << "\n\n";
 	}
+	std::cout << "-------------------"<< "Tree Structure Presentation" << "------------------\n"<<std::endl;
+	std::cout <<"<Tree Node Format (Name, Type, Lines, Complexity)>\n" << std::endl;
 	tempTree->ShowTree();
 }
 

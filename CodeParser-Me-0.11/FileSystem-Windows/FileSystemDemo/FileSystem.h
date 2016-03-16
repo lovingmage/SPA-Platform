@@ -74,10 +74,6 @@
  * ===============
  * FileSystem.h, FileSystem.cpp
  *
- * Build Command:
- * ==============
- * cl /EHa /DTEST_FILESYSTEM FileSystem.cpp
- *
  * Maintenance History:
  * ====================
  * ver 2.6 : 04 Apr 15

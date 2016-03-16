@@ -1,12 +1,13 @@
 #ifndef ACTIONSANDRULES_H
 #define ACTIONSANDRULES_H
 /////////////////////////////////////////////////////////////////////
-//  ActionsAndRules.h - declares new parsing rules and actions     //
-//  ver 2.1                                                        //
-//  Language:      Visual C++ 2008, SP1                            //
-//  Platform:      Dell Precision T7400, Vista Ultimate SP1        //
-//  Application:   Prototype for CSE687 Pr1, Sp09                  //
-//  Author:        Jim Fawcett, CST 4-187, Syracuse University     //
+//  ActionsAndRules.cpp - implements new parsing rules and actions //
+//  ver 1.1                                                        //
+// Language:    C++, Visual Studio 2015                            //
+// Application: Rules & Actions , CIS687 - Object Oriented Design  //
+// Author:		Chenghong Wang, Syracuse University				   //
+//				cwang132@syr.edu								   //
+// Source:        Jim Fawcett, CST 4-187, Syracuse University      //
 //                 (315) 443-3948, jfawcett@twcny.rr.com           //
 /////////////////////////////////////////////////////////////////////
 /*
@@ -17,6 +18,17 @@
   Parser, SemiExpression, and Tokenizer, are intended to be reusable
   without change.  This module provides a place to put extensions of
   these facilities and is not expected to be reusable. 
+
+  Build Process:
+  ==============
+  Required files
+  - Parser.h, Parser.cpp, SemiExp.h, SemiExp.cpp,
+    Tokenizer.h, Tokenizer.cpp, ASTree.h, ASTree.cpp
+    ActionsAndRules.h, ActionsAndRules.cpp, itokcollection.h
+  Build commands (either one)
+  - devenv ActionsAndRules.sln
+  - cl /EHsc /DTEST_PARSER Parser.cpp SemiExp.cpp Tokenizer.cpp \
+  ActionsAndRules.cpp ASTree.cpp /link setargv.obj
 
   Public Interface:
   =================
@@ -30,28 +42,12 @@
   while(se.getSemiExp())          // get semi-expression
     parser.parse();               //   and parse it
 
-  Build Process:
-  ==============
-  Required files
-    - Parser.h, Parser.cpp, ScopeStack.h, ScopeStack.cpp,
-      ActionsAndRules.h, ActionsAndRules.cpp, ConfigureParser.cpp,
-      ItokCollection.h, SemiExpression.h, SemiExpression.cpp, tokenizer.h, tokenizer.cpp
-  Build commands (either one)
-    - devenv CodeAnalysis.sln
-    - cl /EHsc /DTEST_PARSER parser.cpp ActionsAndRules.cpp \
-         semiexpression.cpp tokenizer.cpp /link setargv.obj
-
   Maintenance History:
   ====================
-  ver 2.1 : 15 Feb 16
-  - small functional change to a few of the actions changes display strategy
-  - preface the (new) Toker and SemiExp with Scanner namespace
-  ver 2.0 : 01 Jun 11
-  - added processing on way to building strong code analyzer
-  ver 1.1 : 17 Jan 09
-  - changed to accept a pointer to interfaced ITokCollection instead
-    of a SemiExpression
-  ver 1.0 : 12 Jan 06
+  ver 1.1 : 08 March 2016
+  - Rewrite some rules and corresponding actions, including the function 
+    detection rules, scope detection rules. 
+  ver 1.0 : 05 March 2016
   - first release
 
 */
@@ -204,6 +200,13 @@ public:
     if(p_Repos->scopeStack().size() == 0)
       return;
     element elem = p_Repos->scopeStack().pop();
+
+	if(elem.type == "function")
+	{
+	std::cout << "\n  Function " << elem.name << ", line Start: "<< p_Repos->lineCount()<<", line End: "<<elem.lineCount<<", lines = " << p_Repos->lineCount() - elem.lineCount + 1;
+	std::cout << "\n";
+	}
+
 	size_t linecount = 0;
 	linecount = p_Repos->lineCount() - elem.lineCount + 1;
 	p_Repos->getTree().InsertElement(elem.name, elem.type, linecount);
