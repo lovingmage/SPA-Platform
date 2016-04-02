@@ -1,1 +1,9 @@
-﻿
+﻿  Parser.cpp
+  ConfigureParser.cpp
+  ActionsAndRules.cpp
+  Tokenizer.cpp
+  SemiExp.cpp
+  ScopeStack.cpp
+  FileSystem.cpp
+  Generating Code...
+  Parser.vcxproj -> C:\Users\skiph\OneDrive\Documents\GitHub\SPA-Platform\CodeParser-Me-0.11\x64\Debug\Parser.lib
