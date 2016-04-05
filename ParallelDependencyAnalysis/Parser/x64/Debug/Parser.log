@@ -1,0 +1,9 @@
+﻿  Parser.cpp
+  ConfigureParser.cpp
+  ActionsAndRules.cpp
+  Tokenizer.cpp
+  SemiExp.cpp
+  ScopeStack.cpp
+  FileSystem.cpp
+  Generating Code...
+  Parser.vcxproj -> C:\Users\skiph\Desktop\CodeParse (4)\CodeParse\x64\Debug\Parser.exe
