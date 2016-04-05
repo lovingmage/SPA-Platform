@@ -18,7 +18,7 @@
 using Util = Utilities::StringHelper;
 using WorkResult = std::string;
 
-
+//#define TEST_THREADPOOL
 #ifdef TEST_THREADPOOL
 
 int main()
@@ -63,9 +63,26 @@ int main()
 
 	processor.doWork(&wi3);
 
+	WorkItem<WorkResult>* wi = new WorkItem<WorkResult>;
+	for (size_t i = 0; i < 5; i++) {
+		*wi = []() {
+			std::cout << "\n  working on thread " << std::this_thread::get_id();
+			return "Hello from wi";
+		};
+		processor.doWork(wi);
+		wi++;
+	}
+
 	std::cout << "\n  " << processor.result();
 	std::cout << "\n  " << processor.result();
 	std::cout << "\n  " << processor.result();
+	std::cout << "\n  " << processor.result();
+	std::cout << "\n  " << processor.result();
+	std::cout << "\n  " << processor.result();
+	std::cout << "\n  " << processor.result();
+	std::cout << "\n  " << processor.result();
+
+
 	processor.doWork(nullptr);
 	processor.doWork(nullptr);
 	processor.doWork(nullptr);

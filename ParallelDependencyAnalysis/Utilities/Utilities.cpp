@@ -60,7 +60,7 @@ void Utilities::putline()
   std::cout << "\n";
 }
 
-#ifdef TEST_UTILITIES
+#ifdef TEST_UTILITIESQ
 
 int main()
 {

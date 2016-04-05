@@ -25,7 +25,7 @@ using WorkResult = std::string;
 #ifdef TEST_TYPEANA
 
 
-int main(int argc, char* argv[])
+int main()
 {
 	Util::Title("Enqueued Work Items");
 
@@ -37,24 +37,20 @@ int main(int argc, char* argv[])
 
 	Task<WorkResult> currentTask;
 	TypeAnalysis<WorkResult> typeContainer("../TestFile/", &processor, &currentTask);
+	typeContainer.setAnalysisFiles();
 
-	WorkItem<WorkResult> wi1 = [&]()
-	{
-		typeContainer.typeParser("../TestFile/nimei.cpp");
-		return "Got it!\n";
-
-	};
-	currentTask.createTask(&wi1, &processor);
-
-	WorkItem<WorkResult> wi2 = [&]()
-	{
-		typeContainer.typeParser("../TestFile/MetricExecutive.cpp");
-		return "Got it!\n";
-	};
-
-	currentTask.createTask(&wi2, &processor);
+	WorkItem<WorkResult>* wi = new WorkItem<WorkResult>;
+	for (size_t i = 0; i < 3; i++) {
+		*wi = [&]() {
+			typeContainer.typeParser("long");
+			return "Hello from wi";
+		};
+		processor.doWork(wi);
+		wi++;
+	}
 
 
+	std::cout << "\n  " << processor.result();
 	std::cout << "\n  " << processor.result();
 	std::cout << "\n  " << processor.result();
 
@@ -71,7 +67,7 @@ int main(int argc, char* argv[])
 
 	for (std::map<std::string, std::string>::iterator it = typeContainer._getMergeType().begin(); it != typeContainer._getMergeType().end(); it++)
 	{
-		std::cout << it->first << " ==> "<< it->second << std::endl;
+		std::cout << it->first << " ==> " << it->second << std::endl;
 	}
 	std::cout << "\n\n";
 

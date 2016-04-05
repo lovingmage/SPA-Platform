@@ -226,6 +226,7 @@ std::string SemiExp::show(bool showNewLines)
   return out.str();
 }
 
+
 #ifdef TEST_SEMIEXPQ
 
 int main()

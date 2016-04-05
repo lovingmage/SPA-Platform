@@ -335,7 +335,7 @@ public:
 		{
 			const static std::string keys[]
 				= { "enum", "struct", "class"};
-			for (int i = 0; i < 10; ++i)
+			for (int i = 0; i < 3; ++i)
 			{
 				size_t len = tc.find(keys[i]);
 				if (len < tc.length())

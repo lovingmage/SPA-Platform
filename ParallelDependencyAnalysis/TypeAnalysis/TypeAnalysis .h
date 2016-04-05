@@ -40,7 +40,7 @@ template<typename Result>
 class TypeAnalysis
 {
 public:
-	TypeAnalysis();
+	TypeAnalysis(std::string fi);
 	TypeAnalysis(std::string AnalyPath, ThreadPool<WorkResult>* proc, Task<WorkResult>* pWi);
 	void addTypeAnalysis(WorkItem<Result>* pWi, ThreadPool<WorkResult>* proc);
 	void ternimateAnalysis(ThreadPool<WorkResult>* proc);
@@ -49,7 +49,7 @@ public:
 
 	//Basic Method Defined
 	void initTypeAnalysis();
-	WorkResult typeParser(std::string fi);
+	WorkResult typeParser(const std::string& fi);
 
 	//method to access private data
 	std::vector<std::string>& getFileCollection() { return fileCollection; }
@@ -66,9 +66,13 @@ private:
 	FileMgr fm;
 
 };
-//----< Default Constructor >----------------------------
+
+
 template<typename Result>
-inline TypeAnalysis<Result>::TypeAnalysis(){}
+inline TypeAnalysis<Result>::TypeAnalysis(std::string fi) : fm(fi, ds), anaPath(fi), flagPos(0)
+{
+
+}
 
 //----< Constructor with initiazations>----------------------------
 template<typename Result>
@@ -106,14 +110,18 @@ inline void TypeAnalysis<Result>::initTypeAnalysis()
 
 //----< Member Function for TypeAnalysis which will be called into thread >----------------------------
 template<typename Result>
-inline WorkResult TypeAnalysis<Result>::typeParser(std::string fi)
+inline WorkResult TypeAnalysis<Result>::typeParser(const std::string& fi)
 {
+	std::mutex g_lock;
 	ConfigParseToConsole configure;
 	Parser* pParser = configure.Build();
+	g_lock.lock();
+	flagPos++;
+	g_lock.unlock();
 
 	if (pParser)
 	{
-		if (!configure.Attach(fi))
+		if (!configure.Attach(fileCollection[flagPos]))
 		{
 			std::cout << "\n  could not open file ";
 		}
@@ -125,11 +133,11 @@ inline WorkResult TypeAnalysis<Result>::typeParser(std::string fi)
 	while (pParser->next())
 		pParser->parse();
 	std::cout << "\n";
-	std::mutex g_lock;
+
 	g_lock.lock();
 	for (std::map<std::string, std::string>::iterator it = configure.getType().begin(); it != configure.getType().end(); it++)
 	{
-		_mergeType.insert(std::pair<std::string, std::string>(it->first, fi));
+		_mergeType.insert(std::pair<std::string, std::string>(it->first, fileCollection[flagPos]));
 	}
 	g_lock.unlock();
 	//std::cout<< runningPool->getFlag()<<std::endl;

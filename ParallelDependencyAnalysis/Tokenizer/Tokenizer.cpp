@@ -567,6 +567,7 @@ void testLog(const std::string& msg)
 using Helper = Utilities::StringHelper;
 using namespace Utilities;
 
+//#define TEST_TOKENIZERQ
 #ifdef TEST_TOKENIZERQ
 
 #include <fstream>
@@ -577,9 +578,9 @@ int main()
 {
   Helper::Title("Testing Tokenizer");
 
-  //std::string fileSpec = "../Tokenizer/Tokenizer.cpp";
+  std::string fileSpec = "../Tokenizer/Tokenizer.cpp";
   //std::string fileSpec = "../Tokenizer/Tokenizer.h";
-  std::string fileSpec = "../Tokenizer/Test.txt";
+  //std::string fileSpec = "../Tokenizer/Test.txt";
 
   try
   {
