@@ -1,0 +1,10 @@
+﻿  FileSystem.cpp
+  ScopeStack.cpp
+  SemiExp.cpp
+  Tokenizer.cpp
+  ActionsAndRules.cpp
+  ConfigureParser.cpp
+  Parser.cpp
+Tokenizer.obj : error LNK2001: unresolved external symbol "public: static class std::vector<class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> >,class std::allocator<class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > > > __cdecl Utilities::StringHelper::split(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > const &)" (?split@StringHelper@Utilities@@SA?AV?$vector@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@V?$allocator@V?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@2@@std@@ABV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@4@@Z)
+MSVCRT.lib(exe_main.obj) : error LNK2001: unresolved external symbol _main
+C:\Users\skiph\Desktop\Dependency\ParallelDependencyAnalysis\Release\Parser.exe : fatal error LNK1120: 2 unresolved externals

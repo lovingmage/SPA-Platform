@@ -35,6 +35,8 @@ ConfigParseToConsole::~ConfigParseToConsole()
   delete pScopeDefinition;
   delete pPrintScope;
   delete pPushScope;
+  delete pOtherDefinition;
+  delete pPushOther;
   delete pRepo;
   delete pParser;
   delete pSemi;
@@ -65,7 +67,10 @@ Parser* ConfigParseToConsole::Build()
     pSemi = new SemiExp(pToker);
     pParser = new Parser(pSemi);
     pRepo = new Repository(pToker);
-
+	pOtherDefinition = new OtherDefinition;
+	pPushOther = new PushOther(pRepo);
+	pOtherDefinition->addAction(pPushOther);
+	pParser->addRule(pOtherDefinition);
     // configure to manage scope
     // these must come first - they return true on match
     // so rule checking continues
@@ -77,7 +82,6 @@ Parser* ConfigParseToConsole::Build()
     pHandlePop = new HandlePop(pRepo);
     pEndOfScope->addAction(pHandlePop);
     pParser->addRule(pEndOfScope);
-
 	// configure to detect different scopes
 	// these will stop further rule checking by returning false
 	pScopeDefinition = new ScopeDefinition;
@@ -86,7 +90,6 @@ Parser* ConfigParseToConsole::Build()
 	pScopeDefinition->addAction(pPushScope);
 	pScopeDefinition->addAction(pPrintScope);
 	pParser->addRule(pScopeDefinition);
-
     // configure to detect and act on function definitions
     // these will stop further rule checking by returning false
     pFunctionDefinition = new FunctionDefinition;
@@ -95,7 +98,6 @@ Parser* ConfigParseToConsole::Build()
     pFunctionDefinition->addAction(pPushFunction);
     pFunctionDefinition->addAction(pPrintFunction);
     pParser->addRule(pFunctionDefinition);
-
     return pParser;
   }
   catch(std::exception& ex){

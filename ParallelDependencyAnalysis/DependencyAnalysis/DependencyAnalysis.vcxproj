@@ -167,9 +167,6 @@
     <ProjectReference Include="..\Task\Task.vcxproj">
       <Project>{f50ff6b9-68b6-4f23-8ae9-91f4f71cbad2}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\ThreadPool\ThreadPool.vcxproj">
-      <Project>{919cad10-df94-4556-922f-d7e8f0f3c245}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\Tokenizer\Tokenizer.vcxproj">
       <Project>{fd63ad3d-4a25-4f5c-bd43-1e19192357f2}</Project>
     </ProjectReference>

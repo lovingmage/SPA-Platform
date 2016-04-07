@@ -1,8 +1,12 @@
-///////////////////////////////////////////////////////////////////////
-// QueuedWorkItems.cpp - child thread processes enqueued work items  //
-//                                                                   //
-// Jim Fawcett, CSE687 - Object Oriented Design, Spring 2016         //
-///////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+//  ThreadPool.cpp Analyzes C++ language constructs                //
+//  ver 1.0                                                        //
+//  Language:      Visual C++ 2015, SP1                            //
+//  Application:   ThreadPool for CSE687 Pr3                       //
+//  Author:        Chenghong Wang                                  //
+//  Reference:     Jim Fawcett, CST 4-187, Syracuse University     //
+//                 (315) 443-3948, jfawcett@twcny.rr.com           //
+/////////////////////////////////////////////////////////////////////
 /*
 * A single child thread processes work items equeued by main thread
 */
@@ -18,8 +22,14 @@
 using Util = Utilities::StringHelper;
 using WorkResult = std::string;
 
+
 //#define TEST_THREADPOOL
 #ifdef TEST_THREADPOOL
+
+size_t testfunc(size_t in) {
+	std::cout << in << std::endl;
+	return in;
+}
 
 int main()
 {
@@ -52,43 +62,13 @@ int main()
 
 	processor.doWork(&wi2);
 
-	// the following calls to result() block until results are enqueued
-
-	// define 3rd work item
-
-	WorkItem<WorkResult> wi3 = []() {
-		std::cout << "\n  working on thread " << std::this_thread::get_id();
-		return "Hello from wi3";
-	};
-
-	processor.doWork(&wi3);
-
-	WorkItem<WorkResult>* wi = new WorkItem<WorkResult>;
-	for (size_t i = 0; i < 5; i++) {
-		*wi = []() {
-			std::cout << "\n  working on thread " << std::this_thread::get_id();
-			return "Hello from wi";
-		};
-		processor.doWork(wi);
-		wi++;
-	}
-
 	std::cout << "\n  " << processor.result();
 	std::cout << "\n  " << processor.result();
-	std::cout << "\n  " << processor.result();
-	std::cout << "\n  " << processor.result();
-	std::cout << "\n  " << processor.result();
-	std::cout << "\n  " << processor.result();
-	std::cout << "\n  " << processor.result();
-	std::cout << "\n  " << processor.result();
-
+	size_t po = testfunc(10);
 
 	processor.doWork(nullptr);
 	processor.doWork(nullptr);
 	processor.doWork(nullptr);
-
-
-	// wait for child thread to complete
 
 	processor.wait();
 	std::cout << "\n\n";

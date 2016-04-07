@@ -83,6 +83,8 @@ private:
   PushScope* pPushScope;
   PrintScope* pPrintScope;
   PrintFunction* pPrintFunction;
+  PushOther* pPushOther;
+  OtherDefinition* pOtherDefinition;
 
 
   // prohibit copies and assignments

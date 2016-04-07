@@ -1,4 +1,14 @@
 
+/////////////////////////////////////////////////////////////////////////////
+//  ParallelDependencyAnalysis.cpp - Analyzes dependencey of different file//
+//  ver 1.0																   //
+//  Language:      Visual C++ 2015, SP1									   //
+//  Application:   DependencyAnalysis for CSE687 Pr3					   //
+//  Author:        Chenghong Wang										   //
+//  Reference:     Jim Fawcett, CST 4-187, Syracuse University			   //
+//                 (315) 443-3948, jfawcett@twcny.rr.com				   //
+/////////////////////////////////////////////////////////////////////////////
+
 #include "./ParallelDependencyAnalysis.h"
 #include <vector>
 using namespace Scanner;
@@ -13,18 +23,12 @@ using WorkResult = std::string;
 using Util = Utilities::StringHelper;
 using WorkResult = std::string;
 
-#define TEST_PARADEPENDENCY
+//#define TEST_PARADEPENDENCY
 #ifdef TEST_PARADEPENDENCY
 
 
 int main(int argc, char* argv[])
 {
-
-	Util::Title("Enqueued Work Items");
-
-	std::cout << "\n  main thread id = " << std::this_thread::get_id();
-
-
 	ThreadPool<WorkResult> processor;
 	processor.start();
 
@@ -33,7 +37,6 @@ int main(int argc, char* argv[])
 	typeContainer.setAnalysisFiles();
 
 	size_t file_len = typeContainer.getFileCollection().size();
-
 	WorkItem<WorkResult>* wi = new WorkItem<WorkResult>;
 	for (size_t i = 0; i < 3; i++) {
 		*wi = [&]() {
@@ -41,7 +44,6 @@ int main(int argc, char* argv[])
 			return "Hello from wi";
 		};
 		processor.doWork(wi);
-
 		wi++;
 	}
 
@@ -49,47 +51,30 @@ int main(int argc, char* argv[])
 		std::cout << "\n  " << processor.result();
 	}
 
-
-
-	while ((typeContainer._getfileCollectionQueueSize()) != 0)
-	{
+	while ((typeContainer._getfileCollectionQueueSize()) != 0){
 		continue;
 	}
-
 	typeContainer._initMerge();
-	std::cout << "Map Content Size " << typeContainer._getMergeType().size()<< std::endl;
-	std::cout << "Queue Content Size " << typeContainer._getMergeTypeQueue().size() << std::endl;
-
 	ParaDependencyAnalysis<WorkResult> ParaDepAna;
 	ParaDepAna._getTypes(&typeContainer);
 	
 	WorkItem<WorkResult>* wi2 = new WorkItem<WorkResult>;
-
 	for (size_t i = 0; i < 3; i++) {
 		*wi2 = [&]() {
 			ParaDepAna._startdepAnalysis();
 			return "Hello from dependency";
 		};
 		processor.doWork(wi2);
-
 		wi2++;
 	}
 
 	for (size_t i = 0; i < 3; i++) {
 		std::cout << "\n  " << processor.result();
 	}
-
-
-
-
-
 	// Padding with nullptrs
 	processor.doWork(nullptr);
 	processor.doWork(nullptr);
 	processor.doWork(nullptr);
-
 	processor.wait();
-
-
 }
 #endif

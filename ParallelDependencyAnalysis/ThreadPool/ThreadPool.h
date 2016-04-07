@@ -1,12 +1,43 @@
 #ifndef THREADPOOL_H
 #define THREADPOOL_H
-///////////////////////////////////////////////////////////////////////
-// QueuedWorkItems.h - child thread processes enqueued work items    //
-//                                                                   //
-// Jim Fawcett, CSE687 - Object Oriented Design, Spring 2016         //
-///////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+//  ThreadPool.h - Analyzes C++ language constructs                //
+//  ver 1.0                                                        //
+//  Language:      Visual C++ 2015, SP1                            //
+//  Application:   ThreadPool for CSE687 Pr3                       //
+//  Author:        Chenghong Wang                                  //
+//  Reference:     Jim Fawcett, CST 4-187, Syracuse University     //
+//                 (315) 443-3948, jfawcett@twcny.rr.com           //
+/////////////////////////////////////////////////////////////////////
 /*
-* A single child thread processes work items equeued by main thread
+Module Operations:
+==================
+This module is used for creating a threadpool, so when someone is using
+the threadpool, we will create three threads for them.
+
+Public Interface:
+=================
+BlockingQueue<WorkItem<Result>*>& getWorkingQueue()   //this is used to get working queue of blocking queue
+void start();                                         //this is used to get threadpool start
+void working(WorkItem<Result>* pWi);                  //this is used to get the working item
+size_t getThreadCount();                              //this is used to know how many threads can be in the threadpool
+void suspend();                                       //this is used to wait for joinging the threads
+Result result();                                      //this is used to return result queue
+~ThreadPool();                                        // destruct threadpool
+
+Build Process:
+==============
+Required files
+- Cpp11-BlockingQueue.h, Cpp11-BlockingQueue.cpp, ThreadPool.h, ThreadPool.cpp
+Utility.h, Utility.cpp
+Build commands
+- devenv ThreadPool.sln
+
+Maintenance History:
+====================
+ver 1.0 : 4 Apr 16
+- first release
+
 */
 
 #include <thread>
@@ -14,6 +45,9 @@
 #include <map>
 #include <conio.h>
 #include "Cpp11-BlockingQueue.h"
+#include "../Utilities/Utilities.h"
+
+using Helper = Utilities::StringHelper;
 
 template<typename Result>
 using WorkItem = std::function<Result()>;
@@ -30,7 +64,6 @@ public:
 	void doWork(WorkItem<Result>* pWi);
 	BlockingQueue<WorkItem<Result>*>& getWorkItemQueue(){return _workItemQueue; }
 	std::map<std::string, std::string>& _getMergeType() { return _mergeType; }
-	std::string getFlag() { return flag; }
 	size_t getThreadCount();
 	Result result();
 	void wait();
@@ -41,8 +74,6 @@ private:
 	BlockingQueue<WorkItem<Result>*> _workItemQueue;
 	BlockingQueue<Result> _resultsQueue;
 	std::map<std::string, std::string> _mergeType;
-	//Test Only
-	//const std::string flag = "It's threadpool";
 };
 //----< wait for child thread to terminate >---------------------------
 
@@ -62,8 +93,8 @@ void ThreadPool<Result>::doWork(WorkItem<Result>* pWi)
 {
 	_workItemQueue.enQ(pWi);
 }
-//----< retrieve results with blocking call >--------------------------
 
+//----< retrieve the total number of threads >--------------------------
 template<typename Result>
 inline size_t ThreadPool<Result>::getThreadCount()
 {
@@ -71,6 +102,7 @@ inline size_t ThreadPool<Result>::getThreadCount()
 	return len;
 }
 
+//----< retrieve results with blocking call >--------------------------
 template<typename Result>
 Result ThreadPool<Result>::result()
 {

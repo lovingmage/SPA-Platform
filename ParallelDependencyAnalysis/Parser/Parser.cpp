@@ -70,9 +70,10 @@ void IRule::doActions(ITokCollection*& pTokColl)
       actions[i]->doAction(pTokColl);
 }
 
+//#define TEST_PARSERQ
+
 //----< test stub >--------------------------------------------
 #ifdef TEST_PARSERQ
-
 
 
 #include "../FileSystem-Windows/FileSystemDemo/FileSystem.h"
@@ -107,16 +108,13 @@ int main(int argc, char* argv[])
     Parser* pParser = configure.Build();
     try
     {
-      if(pParser)
-      {
-        if(!configure.Attach(argv[i]))
-        {
+      if(pParser){
+        if(!configure.Attach(argv[i])){
           std::cout << "\n  could not open file " << fileSpec << std::endl;
           continue;
         }
       }
-      else
-      {
+      else{
         std::cout << "\n\n  Parser not built\n\n";
         return 1;
       }
@@ -124,10 +122,6 @@ int main(int argc, char* argv[])
       while(pParser->next())
         pParser->parse();
       std::cout << "\n";
-	  for (std::map<std::string, std::string>::iterator it = configure.getType().begin(); it != configure.getType().end(); it++)
-	  {
-		  std::cout << it->first << " => " << it->second << '\n';
-	  }
     }
     catch(std::exception& ex)
     {

@@ -1,14 +1,14 @@
 /////////////////////////////////////////////////////////////////////
-//  MetricExecutive.cpp - MetricExecutive Package                  //
+//  typeanalysis.h - collect all types in target source files      //    
 //  ver 1.0                                                        //
-// Language:    C++, Visual Studio 2015                            //
-// Application:	MetricExecutive , CIS687 Object Oriented  Design   //
-//                                                                 //
-// Author:		Chenghong Wang, Syracuse University				   //
-//				cwang132@syr.edu								   //
-// Source:        Jim Fawcett, CST 4-187, Syracuse University      //
+//  Language:      Visual C++ 2015, SP1                            //
+//  Application:   TypeAnalysis for CSE687 Pr3                     //
+//  Author:        Chenghong Wang                                  //
+//  Reference:     Jim Fawcett, CST 4-187, Syracuse University     //
 //                 (315) 443-3948, jfawcett@twcny.rr.com           //
 /////////////////////////////////////////////////////////////////////
+
+
 #include "TypeAnalysis .h"
 #include <vector>
 using namespace Scanner;
@@ -55,16 +55,12 @@ int main()
 		std::cout << "\n  " << processor.result();
 	}
 
-
-
 	while ((typeContainer._getfileCollectionQueueSize()) != 0)
 	{
 		continue;
 	}
 
 	typeContainer._initMerge();
-	std::cout << "Map Content Size " << typeContainer._getMergeType().size() << std::endl;
-	std::cout << "Queue Content Size " << typeContainer._getMergeTypeQueue().size() << std::endl;
 
 	// Padding with nullptrs
 

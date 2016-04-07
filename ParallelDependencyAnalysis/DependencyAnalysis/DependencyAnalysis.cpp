@@ -1,4 +1,13 @@
 
+/////////////////////////////////////////////////////////////////////
+//  DependencyAnalysis.h - Analyzes dependencey of different file  //
+//  ver 1.0                                                        //
+//  Language:      Visual C++ 2015, SP1                            //
+//  Application:   DependencyAnalysis for CSE687 Pr3               //
+//  Author:        Chenghong Wang                                  //
+//  Reference:     Jim Fawcett, CST 4-187, Syracuse University     //
+//                 (315) 443-3948, jfawcett@twcny.rr.com           //
+/////////////////////////////////////////////////////////////////////
 #include "./DependencyAnalysis.h"
 #include <vector>
 using namespace Scanner;
@@ -28,15 +37,14 @@ int main(int argc, char* argv[])
 	TypeAnalysis<WorkResult> typeContainer("../TestFile/");
 	typeContainer.setAnalysisFiles();
 
-	std::string tempFile = "../TestFile/nimei.cpp";
-	typeContainer.typeParser(tempFile);
-	typeContainer.typeParser(tempFile);
-	typeContainer.typeParser(tempFile);
+	typeContainer.typeParser();
+	typeContainer.typeParser();
+	typeContainer.typeParser();
 
 
 	DependencyAnalysis<WorkResult> DepAna;
 	DepAna._getTypes(&typeContainer);
-	DepAna._startdepAnalysis(tempFile);
+	DepAna._startdepAnalysis();
 
 	
 }

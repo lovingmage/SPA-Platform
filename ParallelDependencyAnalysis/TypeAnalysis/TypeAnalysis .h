@@ -1,13 +1,50 @@
 #ifndef TYPEANALYSIS_H
 #define TYPEANALYSIS_H
-///////////////////////////////////////////////////////////////////////
-// typeanalysis.h - collect all types in target source files         //
-//                                                                   //
-// Jim Fawcett, CSE687 - Object Oriented Design, Spring 2016         //
-///////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+//  typeanalysis.h - collect all types in target source files      //    
+//  ver 1.0                                                        //
+//  Language:      Visual C++ 2015, SP1                            //
+//  Application:   TypeAnalysis for CSE687 Pr3                     //
+//  Author:        Chenghong Wang                                  //
+//  Reference:     Jim Fawcett, CST 4-187, Syracuse University     //
+//                 (315) 443-3948, jfawcett@twcny.rr.com           //
+/////////////////////////////////////////////////////////////////////
 /*
-* collect all types in target source files, include enums, classes, structs
-* 
+Module Operations:
+==================
+This module is used to collect all types in target source files, it is
+a template.
+
+Public Interface:
+=================
+TypeAnalysis();                                                                               //construct TypeAnalysis
+TypeAnalysis(std::string AnalyPath, ThreadPool<WorkResult>* proc, Task<WorkResult>* pWi);     //construct TypeAnalysis with parameters
+void addTypeAnalysis(WorkItem<Result>* pWi, ThreadPool<WorkResult>* proc);                    //add TypeAnalysis with task and workqueue
+void ternimateAnalysis(ThreadPool<WorkResult>* proc);                                         //give nonepointer if none
+void setAnalysisFiles();                                                                      //it will set the file type
+~TypeAnalysis();                                                                              //destruct TypeAnalysis
+WorkResult typeParser(std::string fi);                                                        //create parser
+std::vector<std::string>& getFileCollection() { return fileCollection; }                      //it used for return file colletcion
+std::map<std::string, std::string>& _getMergeType() { return _mergeType; }                    //it used for return mergeType
+
+
+Build Process:
+==============
+Required files
+- ThreadPool.h, Task.h, Parser.h, DataStore.h, FileMgr.h, Utilities.h, Tokenizer.h,
+ActionsAndRules.h, ConfigureParser.h, Parser.h, ThreadPool.cpp, Task.cpp, Parser.cpp,
+DataStore.cpp, FileMgr.cpp, Utilities.cpp, Tokenizer.cpp, ActionsAndRules.hcpp,
+ConfigureParser.cpp, Parser.cpp
+
+
+Build commands
+- devenv TypeAnalysis.sln
+
+Maintenance History:
+====================
+ver 1.0 : 4 Apr 16
+- first release
+
 */
 
 #include <iostream>
@@ -17,7 +54,6 @@
 #include <conio.h>
 #include <typeinfo> 
 #include <mutex>
-#include "../ThreadPool/ThreadPool.h"
 #include "../Task/Task.h"
 #include "../Parser/Parser.h"
 #include "../DataStore/DataStore.h"
@@ -72,12 +108,9 @@ private:
 
 };
 
-
+//----< Constructor for this class >--------------------------
 template<typename Result>
-inline TypeAnalysis<Result>::TypeAnalysis(std::string fi) : fm(fi, ds), anaPath(fi), flagPos(0)
-{
-
-}
+inline TypeAnalysis<Result>::TypeAnalysis(std::string fi) : fm(fi, ds), anaPath(fi), flagPos(0){}
 
 //----< Constructor with initiazations>----------------------------
 template<typename Result>
@@ -89,7 +122,7 @@ inline TypeAnalysis<Result>::TypeAnalysis(std::string AnalyPath, ThreadPool<Work
 
 //----< Destructor >----------------------------
 template<typename Result>
-inline TypeAnalysis<Result>::~TypeAnalysis() { std::cout << "TypeAnalysis Exit\n"; }
+inline TypeAnalysis<Result>::~TypeAnalysis() {}
 
 //----< Create one type analysis task and enQueue the workQueue >----------------------------
 template<typename Result>
@@ -106,25 +139,21 @@ inline void TypeAnalysis<Result>::ternimateAnalysis(ThreadPool<WorkResult>* proc
 	typeTask->creaNull(ThreadPool<WorkResult>* proc);
 }
 
-
+//----< Init the type analysis process, reserved >--------------------------
 template<typename Result>
-inline void TypeAnalysis<Result>::initTypeAnalysis()
-{
-
-}
+inline void TypeAnalysis<Result>::initTypeAnalysis(){}
 
 //----< Member Function for TypeAnalysis which will be called into thread >----------------------------
 template<typename Result>
 inline WorkResult TypeAnalysis<Result>::typeParser()
 {
 	std::mutex g_lock;
+	std::this_thread::sleep_for(std::chrono::microseconds(rand() % 100));
 	ConfigParseToConsole configure;
 	Parser* pParser = configure.Build();
 	g_lock.lock();
 	std::string handleFile = _fileCollectionQueue.deQ();
-	std::cout << "Content Size " << _fileCollectionQueue.size() << std::endl;
 	g_lock.unlock();
-
 
 	if (pParser)
 	{
@@ -149,6 +178,7 @@ inline WorkResult TypeAnalysis<Result>::typeParser()
 	return "\n Current Parser Work Finish";
 }
 
+//----< Perform the Merge Process >--------------------------
 template<typename Result>
 inline void TypeAnalysis<Result>::_initMerge()
 {

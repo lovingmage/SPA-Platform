@@ -1,12 +1,43 @@
 #ifndef TASK_H
 #define TASK_H
-///////////////////////////////////////////////////////////////////////
-// Task.h - child thread processes enqueued work items               //
-//                                                                   //
-// Jim Fawcett, CSE687 - Object Oriented Design, Spring 2016         //
-///////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
+//  Task.h - Analyzes C++ language constructs                      //
+//  ver 1.0                                                        //
+//  Language:      Visual C++ 2015, SP1                            //
+//  Application:   Task for CSE687 Pr3                             //
+//  Author:        Chenghong Wang                                  //
+//  Reference:     Jim Fawcett, CST 4-187, Syracuse University     //
+//                 (315) 443-3948, jfawcett@twcny.rr.com           //
+/////////////////////////////////////////////////////////////////////
 /*
-* A single child thread processes work items equeued by main thread
+Module Operations:
+==================
+This module is used to create task, and task will be processed by
+ThreadPool, what task do is putting task into the blocking queue.
+
+Public Interface:
+=================
+Task() : flagPos(0) {}                                                     //construct Task
+void createTask(WorkItem<Result>* pWi, ThreadPool<WorkResult>* proc);      //this is used to create Task
+void creaNull(ThreadPool<WorkResult>* proc);                               //creating null point
+size_t _getPos() { return flagPos; }                                       //This is used to return the flag position
+void _incPos() { flagPos++; }                                              //this is used to increase the Flag value
+~Task() {}                                                                 //destruct Task
+
+
+Build Process:
+==============
+Required files
+- Cpp11-BlockingQueue.h, Cpp11-BlockingQueue.cpp, ThreadPool.h, ThreadPool.cpp
+Utility.h, Utility.cpp, Task.h, Task.cpp
+Build commands
+- devenv Task.sln
+
+Maintenance History:
+====================
+ver 1.0 : 4 Apr 16
+- first release
+
 */
 
 #include <thread>

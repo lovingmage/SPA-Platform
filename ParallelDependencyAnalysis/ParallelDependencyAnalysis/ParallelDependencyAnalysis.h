@@ -1,50 +1,38 @@
 #ifndef PARADEPENDENCY_H
 #define PARADEPENDENCY_H
-/////////////////////////////////////////////////////////////////////
-//  MetricExecutive.h - MetricExecutive Package                    //
-//  ver 1.0                                                        //
-// Language:    C++, Visual Studio 2015                            //
-// Application:	MetricExecutive , CIS687 Object Oriented  Design   //
-//                                                                 //
-// Author:		Chenghong Wang, Syracuse University				   //
-//				cwang132@syr.edu								   //
-// Source:        Jim Fawcett, CST 4-187, Syracuse University      //
-//                 (315) 443-3948, jfawcett@twcny.rr.com           //
-/////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+//  ParallelDependencyAnalysis.h - Analyzes dependencey of different file  //
+//  ver 1.0																   //
+//  Language:      Visual C++ 2015, SP1									   //
+//  Application:   DependencyAnalysis for CSE687 Pr3					   //
+//  Author:        Chenghong Wang										   //
+//  Reference:     Jim Fawcett, CST 4-187, Syracuse University			   //
+//                 (315) 443-3948, jfawcett@twcny.rr.com				   //
+/////////////////////////////////////////////////////////////////////////////
 /*
 Module Operations:
 ==================
-This module will search for some specific directory given by command
-argments and then mathc the file pattern given by other command arguments
-and then it will run the MetricAnalysis to analysis each matched fiel.
+This module is used for analyzing dependency of different files and
+output them.
 
 Public Interface:
 =================
-void setPattern(std::string pattern); //Set File pattern
-void setPath(std::string AnalyPath);  //Set Directory Path
-void doExecutive();					  //perform executive
+WorkResult _startdepAnalysis(const std::string& handleFile)            //It is used for starting the dependency analysis
+void _getTypes(TypeAnalysis<WorkResult>* pTypeContainer)               //It is used for checking if types are writing in
 
 Build Process:
 ==============
 Required files
-- Parser.h, Parser.cpp, SemiExp.h, SemiEx.cpp,
-Tokenizer.h, Tokenizer.cpp,
-ActionsAndRules.h, ActionsAndRules.cpp,
-ConfigureParser.h, ConfigureParser.cpp,
-FileSystem.h, FileSystem.cpp,
-FileMgr.h, FileMgr.cpp,
-MetricAnalysis.h, MetricAnalysis.cpp,
-MetricExecutive.h, MetricExecutive.cpp
+- ThreadPool.h, Task.h, Parser.h, TypeAnalysis.h
+ThreadPool.cpp, Task.cpp, Parser.cpp, TypeAnalysis.cpp
 
-Build commands (either one)
-- devenv MetricExecutive.sln
-- cl /EHsc /DTEST_PARSER MetricExecutive.cpp Parser.cpp SemiExp.cpp Tokenizer.cpp \
-ActionsAndRules.cpp ConfigureParser.cpp FileSystem.cpp FileMgr.cpp\
-MetricAnalysis.cpp /link setargv.obj
+
+Build commands
+- devenv ParallelDependencyAnalysis.sln
 
 Maintenance History:
 ====================
-ver 1.0 : 05 March 2016
+ver 1.0 : 4 Apr 16
 - first release
 
 */
@@ -62,7 +50,6 @@ ver 1.0 : 05 March 2016
 #include "../TypeAnalysis/TypeAnalysis .h"
 
 using namespace Scanner;
-using namespace Utilities;
 using Helper = Utilities::StringHelper;
 using namespace Utilities;
 
@@ -74,12 +61,14 @@ class ParaDependencyAnalysis
 public:
 	WorkResult _startdepAnalysis();
 	void _getTypes(TypeAnalysis<WorkResult>* pTypeContainer);
+	BlockingQueue<std::string>& _getDependencyCollection() { return _dependencyCollection; }
 
 
 private:
 	std::vector<std::string> DependencyList;
 	std::map<std::string, std::string> typeCollection;
 	BlockingQueue<std::string> _fileCollectionQueue;
+	BlockingQueue<std::string> _dependencyCollection;
 };
 
 
@@ -89,14 +78,11 @@ template<typename Result>
 inline WorkResult ParaDependencyAnalysis<Result>::_startdepAnalysis()
 {
 	std::mutex g_lock;
-	Helper::Title("Dependency Analysis Start");
-
 	g_lock.lock();
 	std::string handleFile = _fileCollectionQueue.deQ();
-	std::cout << "Content Size " << _fileCollectionQueue.size() << std::endl;
+	//std::cout << "Content Size " << _fileCollectionQueue.size() << std::endl;
 	g_lock.unlock();
-	std::this_thread::sleep_for(std::chrono::microseconds(200));
-	std::cout << "\n Handleing on File " << handleFile << std::endl;
+	std::this_thread::sleep_for(std::chrono::microseconds(60));
 
 	try
 	{
@@ -115,9 +101,11 @@ inline WorkResult ParaDependencyAnalysis<Result>::_startdepAnalysis()
 				std::string tok = toker.getTok();
 				std::map<std::string, std::string>::iterator it;
 				it = typeCollection.find(tok);
-				if (it != typeCollection.end() && (handleFile != it->second))
-
-					std::cout << it->first << "==>" << " Dependent on " << it->second << std::endl;
+				if (it != typeCollection.end() && (handleFile != it->second)) {
+					std::string keyIndex = "\n TYPE NAME : \t<-- " + it->first + " -->\tin \n\t" + handleFile + "\n\tDependence Relation \n\t\t|\n\t\t|\n\t\t--->" + it->second;
+					_dependencyCollection.enQ(keyIndex);
+					//std::cout << it->first << "==>" << " Dependent on " << it->second << std::endl;
+				}
 
 			} while (in.good());
 		}
@@ -130,7 +118,7 @@ inline WorkResult ParaDependencyAnalysis<Result>::_startdepAnalysis()
 		std::cout << "\n  " << ex.what();
 	}
 	std::cout << "\n\n";
-	return "Got Dep!\n";
+	return ".";
 }
 
 //----< return the reference of mergeType >---------------------------
@@ -143,6 +131,6 @@ inline void ParaDependencyAnalysis<Result>::_getTypes(TypeAnalysis<WorkResult>* 
 	for (size_t i = 0; i < len; i++) {
 		_fileCollectionQueue.enQ(temFileMap[i]);
 	}
-	std::cout << "Length of current file : " << _fileCollectionQueue.size();
+	//std::cout << "Length of current file : " << _fileCollectionQueue.size();
 }
 #endif

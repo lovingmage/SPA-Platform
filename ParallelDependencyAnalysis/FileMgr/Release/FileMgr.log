@@ -1,0 +1,4 @@
+﻿  FileSystem.cpp
+  FileMgr.cpp
+MSVCRT.lib(exe_main.obj) : error LNK2001: unresolved external symbol _main
+C:\Users\skiph\Desktop\Dependency\ParallelDependencyAnalysis\Release\FileMgr.exe : fatal error LNK1120: 1 unresolved externals

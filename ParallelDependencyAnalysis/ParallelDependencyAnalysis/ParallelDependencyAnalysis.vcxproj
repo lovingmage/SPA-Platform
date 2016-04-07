@@ -26,7 +26,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>Application</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v140</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -168,7 +168,7 @@
       <Project>{f50ff6b9-68b6-4f23-8ae9-91f4f71cbad2}</Project>
     </ProjectReference>
     <ProjectReference Include="..\ThreadPool\ThreadPool.vcxproj">
-      <Project>{919cad10-df94-4556-922f-d7e8f0f3c245}</Project>
+      <Project>{d7e74059-37b8-4add-b24d-8b9a706d7c8b}</Project>
     </ProjectReference>
     <ProjectReference Include="..\Tokenizer\Tokenizer.vcxproj">
       <Project>{fd63ad3d-4a25-4f5c-bd43-1e19192357f2}</Project>

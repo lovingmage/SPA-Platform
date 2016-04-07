@@ -200,14 +200,8 @@ public:
     if(p_Repos->scopeStack().size() == 0)
       return;
     element elem = p_Repos->scopeStack().pop();
-	/*
-	if(elem.type == "function")
-	{
-	std::cout << "\n  Function " << elem.name;
-	std::cout << "\n";
-	}
-	*/
 	p_Repos->getType().insert(std::pair<std::string, std::string>(elem.name, elem.type));
+	//std::cout << elem.name << " ==> " << elem.type << "\n\n";
   }
 };
 
@@ -330,11 +324,11 @@ public:
 
 	bool doTest(ITokCollection*& pTc)
 	{
+		const static std::string keys[]
+			= { "enum", "struct", "class"};
 		ITokCollection& tc = *pTc;
-		if (tc[tc.length() - 1] == "{")
+	    if (tc[tc.length() - 1] == "{")
 		{
-			const static std::string keys[]
-				= { "enum", "struct", "class"};
 			for (int i = 0; i < 3; ++i)
 			{
 				size_t len = tc.find(keys[i]);
@@ -368,22 +362,18 @@ public:
 		p_Repos->scopeStack().pop();
 		std::string name;
 		std::string type;
-		if ((pTc->find("struct")) < pTc->length())
-		{
+		if ((pTc->find("struct")) < pTc->length()){
 			type = "Struct";
 			name = (*pTc)[1];
 		}
-		else if ((pTc->find("class")) < pTc->length())
-		{
+		else if ((pTc->find("class")) < pTc->length()){
 			type = "Class";
 			name = (*pTc)[1];
 		}
-		else
-		{
+		else{
 			name = (*pTc)[1];
 			type = "Enum";
 		}
-		
 		element elem;
 		elem.type = type;
 		elem.name = name;
@@ -410,8 +400,52 @@ public:
 	}
 };
 
+///////////////////////////////////////////////////////////////
+// rule to detect other using and typedef
+class OtherDefinition : public IRule
+{
+public:
+
+	bool doTest(ITokCollection*& pTc)
+	{
+		ITokCollection& tc = *pTc;
+		if ((tc.find("using") < tc.length() && tc.find("=")<tc.length()) || tc.find("typedef") < tc.length())
+		{
+			doActions(pTc);
+			return true;
+		}
+		return false;
+	}
+};
 
 
 
+///////////////////////////////////////////////////////////////
+// action to push scopes onto ScopeStack
 
+class PushOther : public IAction
+{
+	Repository* p_Repos;
+public:
+	PushOther(Repository* pRepos) {
+		p_Repos = pRepos;
+	}
+	void doAction(ITokCollection*& pTc) {
+		std::string name;
+		std::string type;
+		if ((pTc->find("using")) < pTc->length()) {
+			type = "using";
+			name = (*pTc)[2];
+		}
+		else {
+			name = (*pTc)[pTc->length()-2];
+			type = "typedef";
+		}
+		element elem;
+		elem.type = type;
+		elem.name = name;
+		elem.lineCount = p_Repos->lineCount();
+		p_Repos->getType().insert(std::pair<std::string, std::string>(elem.name, elem.type));
+	}
+};
 #endif

@@ -23,6 +23,7 @@
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Task</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <ProjectName>Task</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -160,9 +161,6 @@
     </ProjectReference>
     <ProjectReference Include="..\SemiExp\SemiExp.vcxproj">
       <Project>{c1131546-c8ae-4a24-a866-4a28dfdb72b9}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\ThreadPool\ThreadPool.vcxproj">
-      <Project>{919cad10-df94-4556-922f-d7e8f0f3c245}</Project>
     </ProjectReference>
     <ProjectReference Include="..\Tokenizer\Tokenizer.vcxproj">
       <Project>{fd63ad3d-4a25-4f5c-bd43-1e19192357f2}</Project>

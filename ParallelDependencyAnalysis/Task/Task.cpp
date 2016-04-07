@@ -1,3 +1,13 @@
+/////////////////////////////////////////////////////////////////////
+//  Task.h - Analyzes C++ language constructs                      //
+//  ver 1.0                                                        //
+//  Language:      Visual C++ 2015, SP1                            //
+//  Application:   Task for CSE687 Pr3                             //
+//  Author:        Chenghong Wang                                  //
+//  Reference:     Jim Fawcett, CST 4-187, Syracuse University     //
+//                 (315) 443-3948, jfawcett@twcny.rr.com           //
+/////////////////////////////////////////////////////////////////////
+
 #include <string>
 #include <iostream>
 #include <conio.h>
