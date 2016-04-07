@@ -13,7 +13,7 @@
 Module Operations:
 ==================
 This module is used for analyzing dependency of different files and
-output them.
+output them, thie module is the parallel version.
 
 Public Interface:
 =================
@@ -80,19 +80,14 @@ inline WorkResult ParaDependencyAnalysis<Result>::_startdepAnalysis()
 	std::mutex g_lock;
 	g_lock.lock();
 	std::string handleFile = _fileCollectionQueue.deQ();
-	//std::cout << "Content Size " << _fileCollectionQueue.size() << std::endl;
 	g_lock.unlock();
-	std::this_thread::sleep_for(std::chrono::microseconds(60));
-
 	try
 	{
 		std::ifstream in(handleFile);
-		if (!in.good())
-		{
+		if (!in.good()){
 			std::cout << "\n  can't open " << handleFile << "\n\n";
 		}
 
-		{
 			Toker toker;
 			toker.returnComments();
 			toker.attach(&in);
@@ -108,13 +103,10 @@ inline WorkResult ParaDependencyAnalysis<Result>::_startdepAnalysis()
 				}
 
 			} while (in.good());
-		}
-
+		
 		putline();
-
 	}
-	catch (std::logic_error& ex)
-	{
+	catch (std::logic_error& ex){
 		std::cout << "\n  " << ex.what();
 	}
 	std::cout << "\n\n";

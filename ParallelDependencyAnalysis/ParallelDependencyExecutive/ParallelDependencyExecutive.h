@@ -12,8 +12,7 @@
 /*
 Module Operations:
 ==================
-This module is used for analyzing dependency of different files and
-output them.
+This module is used for execute the parallelized dependency analysis.
 
 Build Process:
 ==============

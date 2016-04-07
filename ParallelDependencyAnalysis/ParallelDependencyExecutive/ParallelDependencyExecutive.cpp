@@ -33,34 +33,34 @@ int main(int argc, char* argv[])
 	ThreadPool<WorkResult> processor;
 	processor.start();
 
-	Task<WorkResult> currentTask;
+	Task<WorkResult> currentTask;														// Create Task to Receive Tasks
 	TypeAnalysis<WorkResult> typeContainer(argv[1], &processor, &currentTask);
-	typeContainer.setAnalysisFiles(); // Start File Analysis
+	typeContainer.setAnalysisFiles();													// Start File Analysis
 	size_t file_len = typeContainer.getFileCollection().size();
 
 	WorkItem<WorkResult>* wi = new WorkItem<WorkResult>;
-	for (size_t i = 0; i < file_len; i++) {// Start Type Analysis By using multiple thrads
+	for (size_t i = 0; i < file_len; i++) {												// Start Type Analysis By using multiple thrads
 		*wi = [&]() {
 			typeContainer.typeParser();
 			return "Hello from wi";
 		};
-		processor.doWork(wi); wi++;
+		currentTask.createTask(wi, &processor);
 	}
 	for (size_t i = 0; i < file_len; i++) 
 		std::cout << "\n  " << processor.result();
 	while ((typeContainer._getfileCollectionQueueSize()) != 0)
 		continue;
 
-	typeContainer._initMerge();// Init Merge Process;
+	typeContainer._initMerge();															// Init Merge Process;
 	ParaDependencyAnalysis<WorkResult> ParaDepAna;
 	ParaDepAna._getTypes(&typeContainer);
 	WorkItem<WorkResult>* wi2 = new WorkItem<WorkResult>;
-	for (size_t i = 0; i < file_len; i++) {
+	for (size_t i = 0; i < file_len; i++) {												// Start Dependency Analysis 
 		*wi2 = [&]() {
 			ParaDepAna._startdepAnalysis();
 			return "Hello from dependency";
 		};
-		processor.doWork(wi2); wi2++;
+		currentTask.createTask(wi2, &processor);
 	}
 	for (size_t i = 0; i < file_len; i++)
 		std::cout << "\n  " << processor.result();

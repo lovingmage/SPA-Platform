@@ -12,8 +12,9 @@
 /*
 Module Operations:
 ==================
-This module is used for analyzing dependency of different files and
-output them.
+This module is used for analyzing dependency of different files, this
+is not the parallel version, if you want to check the parallel version
+please check the paralleDependencyAnalysis.
 
 Public Interface:
 =================
@@ -25,7 +26,6 @@ Build Process:
 Required files
 - ThreadPool.h, Task.h, Parser.h, TypeAnalysis.h
 ThreadPool.cpp, Task.cpp, Parser.cpp, TypeAnalysis.cpp
-
 
 Build commands
 - devenv DependencyAnalysis.sln

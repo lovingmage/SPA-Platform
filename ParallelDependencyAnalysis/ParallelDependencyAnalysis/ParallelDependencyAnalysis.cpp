@@ -31,11 +31,9 @@ int main(int argc, char* argv[])
 {
 	ThreadPool<WorkResult> processor;
 	processor.start();
-
 	Task<WorkResult> currentTask;
 	TypeAnalysis<WorkResult> typeContainer("../TestFile/", &processor, &currentTask);
 	typeContainer.setAnalysisFiles();
-
 	size_t file_len = typeContainer.getFileCollection().size();
 	WorkItem<WorkResult>* wi = new WorkItem<WorkResult>;
 	for (size_t i = 0; i < 3; i++) {
@@ -71,7 +69,6 @@ int main(int argc, char* argv[])
 	for (size_t i = 0; i < 3; i++) {
 		std::cout << "\n  " << processor.result();
 	}
-	// Padding with nullptrs
 	processor.doWork(nullptr);
 	processor.doWork(nullptr);
 	processor.doWork(nullptr);
