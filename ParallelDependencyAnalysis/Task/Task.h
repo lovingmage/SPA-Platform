@@ -62,7 +62,7 @@ public:
 	Task() : flagPos(0) {}
 	void createTask(WorkItem<Result>* pWi, ThreadPool<WorkResult>* proc);
 	void creaNull(ThreadPool<WorkResult>* proc);
-	size_t _getPos() { return flagPos; }
+	size_t _getPos() { return flagPos; } 
 	void _incPos() { flagPos++; }
 	~Task() {}
 private:
