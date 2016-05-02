@@ -1,4 +1,4 @@
-/////////////////////////////////////////////////////////////////////////
+﻿/////////////////////////////////////////////////////////////////////////
 // MsgServer.cpp - Demonstrates simple one-way HTTP style messaging    //
 //                 and file transfer                                   //
 //                                                                     //
@@ -47,6 +47,7 @@
 #include <direct.h>
 #include <map>
 #include <time.h>
+#include <fstream>
 
 
 using Show = StaticLogger<1>;
@@ -73,10 +74,13 @@ public:
   void operator()(Socket socket);
   const std::string currentDateTime();
   std::string relocateFile(std::string inFiles);
+  int extractFile(std::string Spackage, std::string Dpackage);
+  int extractPackage(std::string packageName);
 private:
   bool connectionClosed_;
   HttpMessage readMessage(Socket& socket);
   bool readFile(const std::string& filename, size_t fileSize, Socket& socket);
+  bool sendFile(const std::string& fqname, std::string filePath, Socket& socket);
   BlockingQueue<HttpMessage>& msgQ_;
   std::map<std::string, std::string> fileMap;
 };
@@ -87,7 +91,6 @@ HttpMessage ClientHandler::readMessage(Socket& socket)
   connectionClosed_ = false;
   HttpMessage msg;
 
-  // read message attributes
 
   while (true)
   {
@@ -113,8 +116,7 @@ HttpMessage ClientHandler::readMessage(Socket& socket)
 
   if (msg.attributes()[0].first == "POST")
   {
-    // is this a file message?
-
+	std::string packagename = msg.findValue("packagename");
     std::string filename = msg.findValue("file");
     if (filename != "")
     {
@@ -138,6 +140,11 @@ HttpMessage ClientHandler::readMessage(Socket& socket)
       msg.addAttribute(HttpMessage::Attribute("content-length", sizeString));
       msg.addBody(bodyString);
     }
+	else if (packagename != "")
+	{
+		extractPackage(packagename);
+	}
+		
     else
     {
       // read message body
@@ -173,7 +180,6 @@ bool ClientHandler::readFile(const std::string& fullname, size_t fileSize, Socke
   std::string shortname = fullname.substr(0, lastindex);
   std::string localTime;
   localTime = currentDateTime();
-
   
   if (fullname.substr(fullname.find_last_of(".") + 1) == "conf")
   {
@@ -188,12 +194,6 @@ bool ClientHandler::readFile(const std::string& fullname, size_t fileSize, Socke
   file.open(FileSystem::File::out, FileSystem::File::binary);
   if (!file.isGood())
   {
-    /*
-     * This error handling is incomplete.  The client will continue
-     * to send bytes, but if the file can't be opened, then the server
-     * doesn't gracefully collect and dump them as it should.  That's
-     * an exercise left for students.
-     */
     Show::write("\n\n  can't open file " + fqname);
     return false;
   }
@@ -221,11 +221,43 @@ bool ClientHandler::readFile(const std::string& fullname, size_t fileSize, Socke
     fileSize -= BlockSize;
   }
   file.close();
-  std::ofstream wofs;
-  wofs.open(fqname, std::ofstream::out | std::ofstream::app);
-  wofs << "<packagename>" + shortname + "</packagename>\n" << "<checkintime>" + localTime + "</checkintime>\n";
-  wofs << "</Metadata>";
+  if (fullname.substr(fullname.find_last_of(".") + 1) == "conf")
+  {
+	  std::ofstream wofs;
+	  wofs.open(fqname, std::ofstream::out | std::ofstream::app);
+	  wofs << "<packagename>" + shortname + "</packagename>\n" << "<checkintime>" + localTime + "</checkintime>\n";
+	  wofs << "</Metadata>";
+  }
+ 
   return true;
+}
+bool ClientHandler::sendFile(const std::string & filename, std::string filePath, Socket & socket)
+{
+	Show::write("Downloading package starting...");
+	std::string fqname = filePath + filename;
+	FileSystem::FileInfo fi(fqname);
+	size_t fileSize = fi.size();
+	std::string sizeString = Converter<size_t>::toString(fileSize);
+	FileSystem::File file(fqname);
+	file.open(FileSystem::File::in, FileSystem::File::binary);
+	if (!file.isGood())
+		return false;
+
+	const size_t BlockSize = 2048;
+	Socket::byte buffer[BlockSize];
+	while (true)
+	{
+		FileSystem::Block blk = file.getBlock(BlockSize);
+		if (blk.size() == 0)
+			break;
+		for (size_t i = 0; i < blk.size(); ++i)
+			buffer[i] = blk[i];
+		socket.send(blk.size(), buffer);
+		if (!file.isGood())
+			break;
+	}
+	file.close();
+	return false;
 }
 //----< receiver functionality is defined by this function >---------
 
@@ -283,15 +315,55 @@ std::string ClientHandler::relocateFile(std::string inFiles)
 		fileMap.insert(std::pair<std::string, std::string>(filename, localTime));
 		dirname = "../TestFiles/" + filename + '_' + localTime + '/';
 		_mkdir(dirname.c_str());
-		/*std::string tempxml = dirname + "Metadata_" + filename + ".xml";
-		std::ofstream outfile(tempxml);
-		std::ofstream wofs;
-		wofs.open(tempxml, std::ofstream::out | std::ofstream::app);
-		wofs << "<Metadata>\n";
-		wofs << "<packagename>" + filename + "</packagename>\n" << "<checkintime>" + localTime + "</checkintime>\n";
-		wofs.close();*/
 	}
 	return dirname;
+}
+
+int ClientHandler::extractFile(std::string Spackage, std::string Dpackage)
+{
+	std::ifstream source(Spackage, std::ios::binary);
+	std::ofstream dest(Dpackage, std::ios::binary);
+
+	std::istreambuf_iterator<char> begin_source(source);
+	std::istreambuf_iterator<char> end_source;
+	std::ostreambuf_iterator<char> begin_dest(dest);
+	copy(begin_source, end_source, begin_dest);
+
+	source.close();
+	dest.close();
+	return 0;
+
+}
+
+int ClientHandler::extractPackage(std::string packageName)
+{
+	std::string packagePath;
+	std::string s1; std::string s2; 	
+	std::string h1; std::string h2;
+	std::string m1; std::string m2;
+
+
+	std::map<std::string, std::string>::iterator it;
+	it = fileMap.find(packageName);
+	if ((it != fileMap.end()))
+	{
+		packagePath = "../TestFiles/" + it->first + '_' + it->second + '/';
+		s1 = packagePath + it->first + ".cpp.snt";
+		s2 = "../TestFiles/Download/" + it->first + ".cpp";
+		h1 = packagePath + it->first + ".h.snt";
+		h2 = "../TestFiles/Download/" + it->first + ".h";
+		m1 = packagePath + it->first + ".xml";
+		m2 = "../TestFiles/Download/" + it->first + ".xml";
+
+		std::string command = "\n Downloading File from Server, Package Path: " + packagePath + '\n';
+		Show::write(command);
+	}
+	extractFile(s1, s2);
+	extractFile(h1, h2);
+	extractFile(m1, m2);
+
+
+	return 0;
 }
 
 //----< test stub >--------------------------------------------------

@@ -35,6 +35,7 @@
 #include "../FileSystem/FileSystem.h"
 #include "../Logger/Logger.h"
 #include "../Utilities/Utilities.h"
+#include <direct.h>
 #include <string>
 #include <iostream>
 #include <thread>
@@ -72,6 +73,8 @@ private:
   HttpMessage makeMessage(size_t n, const std::string& msgBody, const EndPoint& ep);
   void sendMessage(HttpMessage& msg, Socket& socket);
   bool sendFile(const std::string& fqname, std::string filePath, Socket& socket);
+  bool downLoader(const std::string& filename, size_t fileSize, Socket& socket);
+
 };
 //----< factory for creating messages >------------------------------
 /*
@@ -156,6 +159,20 @@ bool MsgClient::sendFile(const std::string& filename, std::string filePath, Sock
   file.close();
   return true;
 }
+//----< this defines the downloader of client>-----------------------
+
+bool MsgClient::downLoader(const std::string & filename, size_t fileSize, Socket & socket)
+{
+
+	HttpMessage msg = makeMessage(1, "", "localhost::8080");
+	msg.addAttribute(HttpMessage::Attribute("packagename", filename));
+	sendMessage(msg, socket);
+	
+	
+	return false;
+}
+
+
 //----< this defines the behavior of the client >--------------------
 
 void MsgClient::execute(const size_t TimeBetweenMessages, const size_t NumMessages)
@@ -273,12 +290,8 @@ void MsgClient::checkIn(std::string filePath)
 			sendFile(hfiles[i], filePath, si);
 			sendFile(dfiles[i], filePath, si);
 		}
-		// send dependency informations.
 
-		std::string msgBody =
-			"<dep>nimei.cpp</dep>";
-		msg = makeMessage(1, msgBody, "localhost:8080");
-		sendMessage(msg, si);
+		downLoader("Logger", 1, si);
 
 		// shut down server's client handler
 		msg = makeMessage(1, "quit", "toAddr:localhost:8080");
@@ -302,6 +315,7 @@ int main()
 
   Show::title("Demonstrating two HttpMessage Clients each running on a child thread");
   MsgClient c1;
+  c1.checkIn("../TestFiles/Logger/");
   c1.checkIn("../TestFiles/Logger/");
   return 0;
   /*
