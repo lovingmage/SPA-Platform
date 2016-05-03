@@ -1,0 +1,12 @@
+<Metadata>
+<dependency>
+<file>nimei.cpp</file>
+<file>neimei2.cpp</file>
+</dependency>
+<packagename>Sockets</packagename>
+<checkintime>_DATE[2016_5_2]__TIME[21_15_10]</checkintime>
+<pakcagecontent>
+<file>Sockets.cpp</file>
+<file>Sockets.h</file>
+</packagecontent>
+</Metadata>

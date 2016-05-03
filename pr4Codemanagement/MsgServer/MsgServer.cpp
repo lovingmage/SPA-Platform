@@ -73,13 +73,13 @@ public:
   ClientHandler(BlockingQueue<HttpMessage>& msgQ) : msgQ_(msgQ) {}
   void operator()(Socket socket);
   const std::string currentDateTime();
-  std::string relocateFile(std::string inFiles);
+  std::string relocateFile(std::string inFiles, std::string STATUS);
   int extractFile(std::string Spackage, std::string Dpackage);
   int extractPackage(std::string packageName);
 private:
   bool connectionClosed_;
   HttpMessage readMessage(Socket& socket);
-  bool readFile(const std::string& filename, size_t fileSize, Socket& socket);
+  bool readFile(const std::string& filename, size_t fileSize, Socket& socket, std::string STATUS);
   bool sendFile(const std::string& fqname, std::string filePath, Socket& socket);
   BlockingQueue<HttpMessage>& msgQ_;
   std::map<std::string, std::string> fileMap;
@@ -118,6 +118,7 @@ HttpMessage ClientHandler::readMessage(Socket& socket)
   {
 	std::string packagename = msg.findValue("packagename");
     std::string filename = msg.findValue("file");
+	std::string STATUS = msg.findValue("status");
     if (filename != "")
     {
       size_t contentSize;
@@ -127,7 +128,7 @@ HttpMessage ClientHandler::readMessage(Socket& socket)
       else
         return msg;
 
-      readFile(filename, contentSize, socket);
+      readFile(filename, contentSize, socket, STATUS);
     }
 
     if (filename != "")
@@ -171,10 +172,10 @@ HttpMessage ClientHandler::readMessage(Socket& socket)
  * and when this function is running, continuosly send bytes until
  * fileSize bytes have been sent.
  */
-bool ClientHandler::readFile(const std::string& fullname, size_t fileSize, Socket& socket)
+bool ClientHandler::readFile(const std::string& fullname, size_t fileSize, Socket& socket, std::string STATUS)
 {
 	
-  std::string dirname = relocateFile(fullname);
+  std::string dirname = relocateFile(fullname, STATUS);
   std::string fqname;
   size_t lastindex = fullname.find_last_of(".");
   std::string shortname = fullname.substr(0, lastindex);
@@ -226,6 +227,7 @@ bool ClientHandler::readFile(const std::string& fullname, size_t fileSize, Socke
 	  std::ofstream wofs;
 	  wofs.open(fqname, std::ofstream::out | std::ofstream::app);
 	  wofs << "<packagename>" + shortname + "</packagename>\n" << "<checkintime>" + localTime + "</checkintime>\n";
+	  wofs << "<pakcagecontent>\n<file>" + shortname + ".cpp</file>\n<file>" + shortname + ".h</file>\n</packagecontent>\n";
 	  wofs << "</Metadata>";
   }
  
@@ -297,7 +299,7 @@ const std::string ClientHandler::currentDateTime()
 
 }
 
-std::string ClientHandler::relocateFile(std::string inFiles)
+std::string ClientHandler::relocateFile(std::string inFiles, std::string STATUS)
 {
 	std::string localTime;
 	localTime = currentDateTime();
@@ -308,13 +310,23 @@ std::string ClientHandler::relocateFile(std::string inFiles)
 	it = fileMap.find(filename);
 	if ((it != fileMap.end()))
 	{ 
-		dirname = "../TestFiles/" + it->first + '_' + it->second + '/';
+		if (STATUS == "close") {
+			dirname = "../TestFiles/Server/" + it->first + '_' + it->second + '/';
+			fileMap.erase(it);
+			Show::write("\n[-------Entering This loop\n Close STATUS detected!-------]\n");
+		}
+		else
+		{
+			dirname = "../TestFiles/Server/" + it->first + '_' + it->second + '/';
+			Show::write("\n[------Entering MODIFICATION-------]\n");
+		}
 	}
 	else
 	{
 		fileMap.insert(std::pair<std::string, std::string>(filename, localTime));
-		dirname = "../TestFiles/" + filename + '_' + localTime + '/';
+		dirname = "../TestFiles/Server/" + filename + '_' + localTime + '/';
 		_mkdir(dirname.c_str());
+		Show::write("\n[------Entering CREATION-------]\n");
 	}
 	return dirname;
 }
@@ -347,13 +359,13 @@ int ClientHandler::extractPackage(std::string packageName)
 	it = fileMap.find(packageName);
 	if ((it != fileMap.end()))
 	{
-		packagePath = "../TestFiles/" + it->first + '_' + it->second + '/';
+		packagePath = "../TestFiles/Server/" + it->first + '_' + it->second + '/';
 		s1 = packagePath + it->first + ".cpp.snt";
-		s2 = "../TestFiles/Download/" + it->first + ".cpp";
+		s2 = "../TestFiles/Client/Download/" + it->first + ".cpp";
 		h1 = packagePath + it->first + ".h.snt";
-		h2 = "../TestFiles/Download/" + it->first + ".h";
+		h2 = "../TestFiles/Client/Download/" + it->first + ".h";
 		m1 = packagePath + it->first + ".xml";
-		m2 = "../TestFiles/Download/" + it->first + ".xml";
+		m2 = "../TestFiles/Client/Download/" + it->first + ".xml";
 
 		std::string command = "\n Downloading File from Server, Package Path: " + packagePath + '\n';
 		Show::write(command);

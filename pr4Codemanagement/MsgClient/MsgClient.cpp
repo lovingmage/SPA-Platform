@@ -68,12 +68,17 @@ class MsgClient
 public:
   using EndPoint = std::string;
   void execute(const size_t TimeBetweenMessages, const size_t NumMessages);
-  void checkIn(std::string filePath);
+  void exeCheckIn(std::string filePath);
+  void multipleCheckIn(std::string filePath);
+  void executeDownload(std::string packageName);
 private:
   HttpMessage makeMessage(size_t n, const std::string& msgBody, const EndPoint& ep);
   void sendMessage(HttpMessage& msg, Socket& socket);
-  bool sendFile(const std::string& fqname, std::string filePath, Socket& socket);
+  bool sendFile(const std::string& fqname, std::string filePath, Socket& socket, std::string STATUS);
   bool downLoader(const std::string& filename, size_t fileSize, Socket& socket);
+  bool downLoadwDep(const std::string& filename, size_t fileSize, Socket& socket, std::vector<std::string> depFiles);
+  bool checkIn(std::string filePath, Socket& socket, std::string STATUS);
+
 
 };
 //----< factory for creating messages >------------------------------
@@ -126,7 +131,7 @@ void MsgClient::sendMessage(HttpMessage& msg, Socket& socket)
  *   has been sent.
  * - Sends in binary mode which works for either text or binary.
  */
-bool MsgClient::sendFile(const std::string& filename, std::string filePath, Socket& socket)
+bool MsgClient::sendFile(const std::string& filename, std::string filePath, Socket& socket, std::string STATUS)
 {
   // assumes that socket is connected
 
@@ -142,6 +147,7 @@ bool MsgClient::sendFile(const std::string& filename, std::string filePath, Sock
   HttpMessage msg = makeMessage(1, "", "localhost::8080");
   msg.addAttribute(HttpMessage::Attribute("file", filename));
   msg.addAttribute(HttpMessage::Attribute("content-length", sizeString));
+  msg.addAttribute(HttpMessage::Attribute("status", STATUS));
   sendMessage(msg, socket);
   const size_t BlockSize = 2048;
   Socket::byte buffer[BlockSize];
@@ -171,91 +177,34 @@ bool MsgClient::downLoader(const std::string & filename, size_t fileSize, Socket
 	
 	return false;
 }
-
-
-//----< this defines the behavior of the client >--------------------
-
-void MsgClient::execute(const size_t TimeBetweenMessages, const size_t NumMessages)
+//-----<Download packages with dependenpency files>
+bool MsgClient::downLoadwDep(const std::string & filename, size_t fileSize, Socket & socket, std::vector<std::string> depFiles)
 {
-  // send NumMessages messages
+	HttpMessage msg = makeMessage(1, "", "localhost::8080");
+	msg.addAttribute(HttpMessage::Attribute("packagename", filename));
+	sendMessage(msg, socket);
+	return false;
+}
 
-  ClientCounter counter;
-  size_t myCount = counter.count();
-  std::string myCountString = Utilities::Converter<size_t>::toString(myCount);
-
-  Show::attach(&std::cout);
-  Show::start();
-
-  Show::title(
-    "Starting HttpMessage client" + myCountString + 
-    " on thread " + Utilities::Converter<std::thread::id>::toString(std::this_thread::get_id())
-  );
-  try
-  {
-    SocketSystem ss;
-    SocketConnecter si;
-    while (!si.connect("localhost", 8080))
-    {
-      Show::write("\n client waiting to connect");
-      ::Sleep(100);
-    }
-    
-    // send a set of messages
-
-    HttpMessage msg;
-
-    for (size_t i = 0; i < NumMessages; ++i)
-    {
-      std::string msgBody = 
-        "<msg>Message #" + Converter<size_t>::toString(i + 1) + 
-        " from client #" + myCountString + "</msg>";
-      msg = makeMessage(1, msgBody, "localhost:8080");
-      /*
-       * Sender class will need to accept messages from an input queue
-       * and examine the toAddr attribute to see if a new connection
-       * is needed.  If so, it would either close the existing connection
-       * or save it in a map[url] = socket, then open a new connection.
-       */
-      sendMessage(msg, si);
-      Show::write("\n\n  client" + myCountString + " sent\n" + msg.toIndentedString());
-      ::Sleep(TimeBetweenMessages);
-    }
-    //  send all *.cpp files from TestFiles folder
-
-    std::vector<std::string> files = FileSystem::Directory::getFiles("../TestFiles", "*.cpp");
-    for (size_t i = 0; i < files.size(); ++i)
-    {
-      Show::write("\n\n  sending file " + files[i]);
-      sendFile(files[i], "../TestFiles/",si);
-    }
-
-	//  send all *.h from TestFiles folder
-	std::vector<std::string> files1 = FileSystem::Directory::getFiles("../TestFiles", "*.h");
-	for (size_t i = 0; i < files1.size(); ++i)
+bool MsgClient::checkIn(std::string filePath, Socket & socket, std::string STATUS)
+{
+	std::vector<std::string> files = FileSystem::Directory::getFiles(filePath, "*.cpp");
+	std::vector<std::string> hfiles = FileSystem::Directory::getFiles(filePath, "*.h");
+	std::vector<std::string> dfiles = FileSystem::Directory::getFiles(filePath, "*.conf");
+	for (size_t i = 0; i < files.size(); ++i)
 	{
-		Show::write("\n\n  sending file " + files1[i]);
-		sendFile(files1[i], "../TestFiles/", si);
+		Show::write("\n\n  sending file " + files[i]);
+		sendFile(files[i], filePath, socket, "open");
+		sendFile(hfiles[i], filePath, socket, "open");
+		sendFile(dfiles[i], filePath, socket, STATUS);
 	}
 
-    // shut down server's client handler
-
-    msg = makeMessage(1, "quit", "toAddr:localhost:8080");
-    sendMessage(msg, si);
-    Show::write("\n\n  client" + myCountString + " sent\n" + msg.toIndentedString());
-
-    Show::write("\n");
-    Show::write("\n  All done folks");
-  }
-  catch (std::exception& exc)
-  {
-    Show::write("\n  Exeception caught: ");
-    std::string exMsg = "\n  " + std::string(exc.what()) + "\n\n";
-    Show::write(exMsg);
-  }
+	return false;
 }
 
 
-void MsgClient::checkIn(std::string filePath)
+
+void MsgClient::exeCheckIn(std::string filePath)
 {
 	ClientCounter counter;
 	size_t myCount = counter.count();
@@ -279,19 +228,97 @@ void MsgClient::checkIn(std::string filePath)
 
 		// send a set of messages
 		HttpMessage msg;
-		//  send all files from selected packages
-		std::vector<std::string> files = FileSystem::Directory::getFiles(filePath, "*.cpp");
-		std::vector<std::string> hfiles = FileSystem::Directory::getFiles(filePath, "*.h");
-		std::vector<std::string> dfiles = FileSystem::Directory::getFiles(filePath, "*.conf");
-		for (size_t i = 0; i < files.size(); ++i)
+		//checkIn Test
+		checkIn(filePath, si, "open");
+
+		// shut down server's client handler
+		msg = makeMessage(1, "quit", "toAddr:localhost:8080");
+		sendMessage(msg, si);
+		Show::write("\n\n  client" + myCountString + " sent\n" + msg.toIndentedString());
+		Show::write("\n");
+		Show::write("\n  All done folks");
+	}
+	catch (std::exception& exc)
+	{
+		Show::write("\n  Exeception caught: ");
+		std::string exMsg = "\n  " + std::string(exc.what()) + "\n\n";
+		Show::write(exMsg);
+	}
+}
+//------< Perform multiple checkin to without flag close >---------------------------------------
+void MsgClient::multipleCheckIn(std::string filePath)
+{
+	ClientCounter counter;
+	size_t myCount = counter.count();
+	std::string myCountString = Utilities::Converter<size_t>::toString(myCount);
+	Show::attach(&std::cout);
+	Show::start();
+
+	Show::title(
+		"Starting HttpMessage client" + myCountString +
+		" on thread " + Utilities::Converter<std::thread::id>::toString(std::this_thread::get_id())
+		);
+	try
+	{
+		SocketSystem ss;
+		SocketConnecter si;
+		while (!si.connect("localhost", 8080))
 		{
-			Show::write("\n\n  sending file " + files[i]);
-			sendFile(files[i], filePath, si);
-			sendFile(hfiles[i], filePath, si);
-			sendFile(dfiles[i], filePath, si);
+			Show::write("\n client waiting to connect");
+			::Sleep(100);
 		}
 
-		downLoader("Logger", 1, si);
+		// send a set of messages
+		HttpMessage msg;
+		// 1st time CheckIn 
+		checkIn(filePath, si, "close");
+		::Sleep(1000);
+		// 2nd Time CheckIn
+		checkIn(filePath, si, "open");
+
+		msg = makeMessage(1, "quit", "toAddr:localhost:8080");
+		sendMessage(msg, si);
+		Show::write("\n\n  client" + myCountString + " sent\n" + msg.toIndentedString());
+		Show::write("\n");
+		Show::write("\n  All done folks");
+	}
+	catch (std::exception& exc)
+	{
+		Show::write("\n  Exeception caught: ");
+		std::string exMsg = "\n  " + std::string(exc.what()) + "\n\n";
+		Show::write(exMsg);
+	}
+}
+
+//-----< execute The Download Process>-------------------------------
+void MsgClient::executeDownload(std::string packageName)
+{
+	ClientCounter counter;
+	size_t myCount = counter.count();
+	std::string myCountString = Utilities::Converter<size_t>::toString(myCount);
+	Show::attach(&std::cout);
+	Show::start();
+
+	Show::title(
+		"Starting HttpMessage client" + myCountString +
+		" on thread " + Utilities::Converter<std::thread::id>::toString(std::this_thread::get_id())
+		);
+	try
+	{
+		SocketSystem ss;
+		SocketConnecter si;
+		while (!si.connect("localhost", 8080))
+		{
+			Show::write("\n client waiting to connect");
+			::Sleep(100);
+		}
+
+		// send a set of messages
+		HttpMessage msg;
+		//checkIn Test
+		checkIn("../TestFiles/Client/Sockets/", si, "open");
+
+		downLoader(packageName, 1, si);
 
 		// shut down server's client handler
 		msg = makeMessage(1, "quit", "toAddr:localhost:8080");
@@ -314,21 +341,17 @@ int main()
   ::SetConsoleTitle(L"Clients Running on Threads");
 
   Show::title("Demonstrating two HttpMessage Clients each running on a child thread");
-  MsgClient c1;
-  c1.checkIn("../TestFiles/Logger/");
-  c1.checkIn("../TestFiles/Logger/");
-  return 0;
-  /*
-  MsgClient c1;
-  std::thread t1(
-    [&]() { c1.execute(100, 20); } // 20 messages 100 millisec apart
-  );
+  //MsgClient c1;
+  //c1.exeCheckIn("../TestFiles/Client/Logger/");
 
   MsgClient c2;
-  std::thread t2(
-    [&]() { c2.execute(120, 20); } // 20 messages 120 millisec apart
-  );
-  t1.join();
-  t2.join();
-  */
+  c2.multipleCheckIn("../TestFiles/Client/Logger/");
+
+
+  MsgClient c3;
+  c3.executeDownload("Sockets");
+
+
+  return 0;
+
 }
